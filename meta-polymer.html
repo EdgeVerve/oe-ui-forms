@@ -115,7 +115,13 @@
       uiType: 'oe-data-table'
     },
     object: {
-      uiType: 'oe-json-input'
+      uiType: 'oe-json-input',
+      formatter: function (value, options) {
+        if (value && typeof value === 'object') {
+          return JSON.stringify(value);
+        }
+        return value;
+      }
     },
     objectid: {
       uiType: 'oe-input'
