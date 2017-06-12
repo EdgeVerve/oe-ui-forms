@@ -382,12 +382,12 @@
     masterMetadata.content =
       '<oe-field data-content="true" field-id="revisionDates"></oe-field><oe-field data-content="true" oe-container="main" field-id="dateOfBirth"></oe-field><oe-field data-content="true" oe-container="another" field-id="rankings"></oe-field>';
     var EV = EV || {};
-    baseUtils.metadataCache = baseUtils.metadataCache || {};
-    baseUtils.metadataCache['employee-form'] = masterMetadata;
+    OEUtils.metadataCache = OEUtils.metadataCache || {};
+    OEUtils.metadataCache['employee-form'] = masterMetadata;
 
 
     var expressionsMeta = JSON.parse(JSON.stringify(masterMetadata));
-    baseUtils.metadataCache['employee-expressions-form'] = expressionsMeta;
+    OEUtils.metadataCache['employee-expressions-form'] = expressionsMeta;
 
     expressionsMeta.fields = [{
       fieldId: 'lastName',
@@ -555,8 +555,8 @@
 
     server.respondWith(restServer.getHandler());
 
-    if (baseUtils.geturl) {
-      baseUtils.geturl = function (url) {
+    if (OEUtils.geturl) {
+      OEUtils.geturl = function (url) {
         return url;
       }
     }
@@ -570,7 +570,7 @@
   <link rel="import" href="../lazy-component.html">
 
   <script>
-    window.baseUtils.TypeMappings.string = {
+    window.OEUtils.TypeMappings.string = {
       type: 'string',
       uiType: 'oe-input',
       attributes: [{
@@ -583,7 +583,7 @@
         }
       }]
     };
-    window.baseUtils.TypeMappings.tags = {
+    window.OEUtils.TypeMappings.tags = {
       type: 'tags',
       uiType: 'oe-paper-chip',
       attributes: [{
@@ -668,7 +668,7 @@
             notify: true
           }
         },
-        behaviors: [baseUtils.FormValidationBehavior, baseUtils.ModelHandler]
+        behaviors: [OEUtils.FormValidationBehavior, OEUtils.ModelHandler]
       });
 
     </script>
@@ -809,10 +809,10 @@
 
       suite('generation', function () {
         test('should pull TypeMappings from server and merge', function (done) {
-          expect(baseUtils.TypeMappings).to.exist;
-          expect(baseUtils.TypeMappings.object).to.exist;
-          expect(baseUtils.TypeMappings.object.rows).to.equal(1);
-          expect(baseUtils.TypeMappings.object.maxRows).to.equal(5);
+          expect(OEUtils.TypeMappings).to.exist;
+          expect(OEUtils.TypeMappings.object).to.exist;
+          expect(OEUtils.TypeMappings.object.rows).to.equal(1);
+          expect(OEUtils.TypeMappings.object.maxRows).to.equal(5);
           done();
         });
         test('should generate Polymer component', function (done) {
@@ -825,19 +825,19 @@
         });
         test('generated element has MetaBehavior and relevant data is set', function (done) {
           var element = fixture('simple');
-          expect(element.meta).to.exist.and.equal(baseUtils.metadataCache[element.is]);
-          expect(element.modelAlias).to.exist.and.equal(baseUtils.metadataCache[element.is].modelAlias);
-          expect(element.resturl).to.exist.and.equal(baseUtils.metadataCache[element.is].metadata.resturl);
-          expect(element.defaultVM).to.exist.and.equal(baseUtils.metadataCache[element.is].defaultVM);
+          expect(element.meta).to.exist.and.equal(OEUtils.metadataCache[element.is]);
+          expect(element.modelAlias).to.exist.and.equal(OEUtils.metadataCache[element.is].modelAlias);
+          expect(element.resturl).to.exist.and.equal(OEUtils.metadataCache[element.is].metadata.resturl);
+          expect(element.defaultVM).to.exist.and.equal(OEUtils.metadataCache[element.is].defaultVM);
           done();
         });
 
         test('Metadata is fetched if not available in cache', function (done) {
           var element = fixture('notcached');
-          expect(element.meta).to.exist.and.equal(baseUtils.metadataCache[element.is]);
-          expect(element.modelAlias).to.exist.and.equal(baseUtils.metadataCache[element.is].modelAlias);
-          expect(element.resturl).to.exist.and.equal(baseUtils.metadataCache[element.is].metadata.resturl);
-          expect(element.defaultVM).to.exist.and.equal(baseUtils.metadataCache[element.is].defaultVM);
+          expect(element.meta).to.exist.and.equal(OEUtils.metadataCache[element.is]);
+          expect(element.modelAlias).to.exist.and.equal(OEUtils.metadataCache[element.is].modelAlias);
+          expect(element.resturl).to.exist.and.equal(OEUtils.metadataCache[element.is].metadata.resturl);
+          expect(element.defaultVM).to.exist.and.equal(OEUtils.metadataCache[element.is].defaultVM);
           done();
         });
       });
@@ -853,28 +853,28 @@
           var element = fixture('simple');
           var ctrl = Polymer.dom(element.root).querySelector('[field-id=firstName]');
           expect(ctrl).to.exist;
-          expect(ctrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.string.uiType);
+          expect(ctrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.string.uiType);
           done();
         });
         test('should generate oe-decimal for number type', function (done) {
           var element = fixture('simple');
           var salaryCtrl = Polymer.dom(element.root).querySelector('[field-id=salary]');
           expect(salaryCtrl).to.exist;
-          expect(salaryCtrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.number.uiType);
+          expect(salaryCtrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.number.uiType);
           done();
         });
         test('should generate oe-date for date type', function (done) {
           var element = fixture('simple');
           var dateCtrl = Polymer.dom(element.root).querySelector('[field-id=joiningDate]');
           expect(dateCtrl).to.exist;
-          expect(dateCtrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.date.uiType);
+          expect(dateCtrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.date.uiType);
           done();
         });
         test('should generate oe-checkbox for boolean type', function (done) {
           var element = fixture('simple');
           var booleanCtrl = Polymer.dom(element.root).querySelector('[field-id=bandApplicable]');
           expect(booleanCtrl).to.exist;
-          expect(booleanCtrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.boolean.uiType);
+          expect(booleanCtrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.boolean.uiType);
           done();
         });
         test('label is derrived from field-id', function (done) {
@@ -897,7 +897,7 @@
           var element = fixture('simple');
           var empIdCtrl = Polymer.dom(element.root).querySelector('[field-id=empId]');
           expect(empIdCtrl).to.exist;
-          expect(empIdCtrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.string.uiType);
+          expect(empIdCtrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.string.uiType);
           //make sure it is not the auto-generated one.
           expect(empIdCtrl.parentElement.getAttribute('id')).to.equal('main');
           expect(Polymer.dom(element.root).querySelector('oe-field')).to.not.exist;
@@ -918,12 +918,12 @@
           var element = fixture('simple');
           var ctrl = Polymer.dom(element.root).querySelector('[field-id=priorExp]');
           expect(ctrl).to.exist;
-          expect(ctrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.number.uiType);
+          expect(ctrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.number.uiType);
           //make sure it is not the auto-generated one.
           expect(ctrl.parentElement.getAttribute('id')).to.equal('main');
           ctrl = Polymer.dom(element.root).querySelector('[field-id=skills]');
           expect(ctrl).to.exist;
-          expect(ctrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.tags.uiType);
+          expect(ctrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.tags.uiType);
           //make sure it is not the auto-generated one.
           expect(ctrl.parentElement.getAttribute('id')).to.equal('main');
           expect(Polymer.dom(element.root).querySelector('oe-fields')).to.not.exist;
@@ -959,7 +959,7 @@
           var element = fixture('simple');
           var ctrl = Polymer.dom(element.root).querySelector('[field-id=firstName]');
           expect(ctrl).to.exist;
-          expect(ctrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.string.uiType);
+          expect(ctrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.string.uiType);
           expect(ctrl.label).to.equal(masterMetadata.fields[0].label);
           expect(ctrl.fieldId).to.equal(masterMetadata.fields[0].fieldId);
           expect(ctrl.parentElement.getAttribute('id')).to.equal('main');
@@ -970,7 +970,7 @@
           var element = fixture('simple');
           var ctrl = Polymer.dom(element.root).querySelector('[field-id=salary]');
           expect(ctrl).to.exist;
-          expect(ctrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.number.uiType);
+          expect(ctrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.number.uiType);
           expect(ctrl.fieldId).to.equal(masterMetadata.fields[2]);
           expect(ctrl.parentElement.getAttribute('id')).to.equal('fields');
           done();
@@ -1016,7 +1016,7 @@
           var element = fixture('simple');
           var ctrl = Polymer.dom(element.root).querySelector('[field-id=firstName]');
           expect(ctrl).to.exist;
-          expect(ctrl.nodeName.toLowerCase()).to.equal(baseUtils.TypeMappings.string.uiType);
+          expect(ctrl.nodeName.toLowerCase()).to.equal(OEUtils.TypeMappings.string.uiType);
           //make sure it is not the auto-generated one.
           expect(ctrl.parentElement.getAttribute('id')).to.equal('main');
           done();

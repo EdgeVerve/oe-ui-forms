@@ -5,22 +5,22 @@
 
 <link rel="import" href="behaviors/oe-utils-behavior.html">
 <link rel="import" href="../oe-ajax/oe-ajax.html">
-<script src="../oe-utils/base-utils.js"></script>
+<script src="../oe-utils/oe-utils.js"></script>
 
 <script>
-  window.baseUtils = window.baseUtils || {};
-  var baseUtils = window.baseUtils;
-  baseUtils.metadataCache = baseUtils.metadataCache || {};
-  baseUtils.modelDefCache = baseUtils.modelDefCache || {};
+  window.OEUtils = window.OEUtils || {};
+  var OEUtils = window.OEUtils;
+  OEUtils.metadataCache = OEUtils.metadataCache || {};
+  OEUtils.modelDefCache = OEUtils.modelDefCache || {};
 
-  baseUtils.deepValue = function (obj, path) {
+  OEUtils.deepValue = function (obj, path) {
     for (var i = 0, path = path.split('.'), len = path.length; obj && i < len; i++) { // eslint-disable-line no-redeclare
       obj = obj[path[i]];
     }
     return obj;
   };
 
-  baseUtils.createFunction = function (funcStr) {
+  OEUtils.createFunction = function (funcStr) {
     funcStr = funcStr.trim();
     if (funcStr.startsWith('function')) {
       var head = funcStr.substr(0, funcStr.indexOf('{'));
@@ -46,7 +46,7 @@
           resolve(event.detail.response);
         });
         metaAjax.addEventListener('error', function (event) {
-          reject(baseUtils.extractErrorMessage(event));
+          reject(OEUtils.extractErrorMessage(event));
         });
         metaAjax.generateRequest();
       });
@@ -57,7 +57,7 @@
     }
   };
 
-  baseUtils.TypeMappings = {
+  OEUtils.TypeMappings = {
     date: {
       uiType: 'oe-date',
       formatter: function (value, options) {
@@ -65,7 +65,7 @@
           return value;
         }
         var format = (options && options.format) ? options.format : 'DD MMM YYYY';
-        return baseUtils.DateUtils.format(value, format);
+        return OEUtils.DateUtils.format(value, format);
       }
     },
     timestamp: {
@@ -75,7 +75,7 @@
           return value;
         }
         var format = (options && options.format) ? options.format : 'DD MMM YYYY';
-        return baseUtils.DateUtils.format(value, format);
+        return OEUtils.DateUtils.format(value, format);
       }
     },
     string: {
@@ -116,7 +116,7 @@
     },
     object: {
       uiType: 'oe-json-input',
-      formatter: function (value, options) {
+      formatter: function (value, options) { // eslint-disable-line no-unused-vars
         if (value && typeof value === 'object') {
           return JSON.stringify(value);
         }
@@ -141,11 +141,11 @@
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         var typeMappings = JSON.parse(xhttp.responseText);
         typeMappings.forEach(function (mapping) {
-          baseUtils.TypeMappings[mapping.type] = mapping;
+          OEUtils.TypeMappings[mapping.type] = mapping;
         });
       }
     };
-    var url = baseUtils.geturl('/api/TypeMappings');
+    var url = OEUtils.geturl('/api/TypeMappings');
     xhttp.open('GET', url, true);
     xhttp.setRequestHeader('Content-Type', 'application/json;charset=encoding');
     xhttp.send();
@@ -170,11 +170,11 @@
   //              <box evfields tab=mytab box=box1>
   //
 
-  baseUtils.MetaBehavior = {
+  OEUtils.MetaBehavior = {
     ready: function () {
       this._isEVMeta = true;
-      if (baseUtils.metadataCache[this.is]) {
-        var meta = baseUtils.metadataCache[this.is];
+      if (OEUtils.metadataCache[this.is]) {
+        var meta = OEUtils.metadataCache[this.is];
         this.set('meta', meta);
         this.set('modelAlias', meta.modelAlias);
         meta.metadata = meta.metadata || {};
@@ -191,26 +191,26 @@
     }
   };
 
-  baseUtils.getModelDefinition = function (model, done) {
-    if (baseUtils.modelDefCache[model]) {
-      done(null, baseUtils.modelDefCache[model]);
+  OEUtils.getModelDefinition = function (model, done) {
+    if (OEUtils.modelDefCache[model]) {
+      done(null, OEUtils.modelDefCache[model]);
     } else {
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function () {
         if (xhttp.readyState === 4 && xhttp.status === 200) {
           var modelDefinition = JSON.parse(xhttp.responseText);
-          baseUtils.modelDefCache[model] = modelDefinition[model];
-          done(null, baseUtils.modelDefCache[model]);
+          OEUtils.modelDefCache[model] = modelDefinition[model];
+          done(null, OEUtils.modelDefCache[model]);
         }
       };
-      var url = baseUtils.geturl('/api/ModelDefinitions/modelmeta/' + model);
+      var url = OEUtils.geturl('/api/ModelDefinitions/modelmeta/' + model);
       xhttp.open('GET', url, true);
       xhttp.setRequestHeader('Content-Type', 'application/json;charset=encoding');
       xhttp.send();
     }
   };
 
-  baseUtils.Metamorph = function (template, uimeta, prototype) {
+  OEUtils.Metamorph = function (template, uimeta, prototype) {
     var templateCont = template.content;
 
     function camelCaseToLabel(s) {
@@ -228,7 +228,7 @@
     }
 
     function createMergedNode(fmeta, e) {
-      var typeMap = window.baseUtils.TypeMappings[fmeta.type] || {};
+      var typeMap = window.OEUtils.TypeMappings[fmeta.type] || {};
       fmeta.uitype = fmeta.uitype || typeMap.uiType || 'oe-input';
       var obj = {};
       typeMap.attributes && typeMap.attributes.forEach(function (attr) {
@@ -257,7 +257,7 @@
     }
 
     function createNodeForMetaDefn(fmeta) {
-      var typeMap = window.baseUtils.TypeMappings[fmeta.numericality || fmeta.type] || {};
+      var typeMap = window.OEUtils.TypeMappings[fmeta.numericality || fmeta.type] || {};
       fmeta.uitype = fmeta.uitype || typeMap.uiType || 'oe-input';
       var node = createNodeForElement(fmeta.uitype);
       typeMap.attributes && typeMap.attributes.forEach(function (attr) {
@@ -502,7 +502,7 @@
         if (node.nodeName === 'OE-GRID') {
           fmeta.columnDefs = [];
           Object.keys(fmeta.subModelMeta).forEach(function (prop) {
-            var type = window.baseUtils.TypeMappings[fmeta.subModelMeta[prop].type] || 'string';
+            var type = window.OEUtils.TypeMappings[fmeta.subModelMeta[prop].type] || 'string';
             var col = {
               field: prop,
               headerName: camelCaseToLabel(prop),
@@ -734,7 +734,7 @@
             }
             e = node;
           } else {
-            var typeMap = window.baseUtils.TypeMappings[fmeta.type] || {};
+            var typeMap = window.OEUtils.TypeMappings[fmeta.type] || {};
             setMissingAttributes(e, typeMap.attributes);
             setAttributesOnNode(e, fieldId, fmeta, uimeta, e.parentNode, false);
           }
@@ -983,10 +983,10 @@
 
     function regiterWithPolymer() {
       prototype.behaviors = prototype.behaviors || [];
-      prototype.behaviors.push(baseUtils.MetaBehavior);
-      prototype.behaviors.push(baseUtils.UtilsBehavior);
+      prototype.behaviors.push(OEUtils.MetaBehavior);
+      prototype.behaviors.push(OEUtils.UtilsBehavior);
 
-      if (prototype.behaviors.indexOf(baseUtils.FormValidationBehavior) >= 0) {
+      if (prototype.behaviors.indexOf(OEUtils.FormValidationBehavior) >= 0) {
         prototype.observers = prototype.observers || [];
         prototype.observers.push('_clearAllErrors(' + uimeta.modelAlias + ')');
       }
@@ -1002,11 +1002,11 @@
 
       if (uimeta.polymerConfig) {
         for (var i in uimeta.polymerConfig.behaviors) {
-          prototype.behaviors.push(baseUtils.deepValue(window, uimeta.polymerConfig.behaviors[i]));
+          prototype.behaviors.push(OEUtils.deepValue(window, uimeta.polymerConfig.behaviors[i]));
         }
 
         for (var funcName in uimeta.polymerConfig.functions) {
-          prototype[funcName] = baseUtils.createFunction(uimeta.polymerConfig.functions[funcName]);
+          prototype[funcName] = OEUtils.createFunction(uimeta.polymerConfig.functions[funcName]);
         }
 
         for (var propName in uimeta.polymerConfig.properties) {
@@ -1026,9 +1026,9 @@
     xhttp.onreadystatechange = function () {
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         uimeta = JSON.parse(xhttp.responseText);
-        baseUtils.metadataCache[metaKey] = uimeta;
+        OEUtils.metadataCache[metaKey] = uimeta;
         populateModelDefCache(uimeta);
-        baseUtils.Metamorph(template, uimeta, prototype);
+        OEUtils.Metamorph(template, uimeta, prototype);
         regiterWithPolymer();
       }
     };
@@ -1042,26 +1042,26 @@
       if (uimeta.metadata && uimeta.metadata.models) {
         var models = uimeta.metadata.models;
         Object.keys(models).forEach(function (modelName) {
-          if (!baseUtils.modelDefCache[modelName]) {
-            baseUtils.modelDefCache[modelName] = models[modelName];
+          if (!OEUtils.modelDefCache[modelName]) {
+            OEUtils.modelDefCache[modelName] = models[modelName];
           }
         });
       }
     }
 
-    if (!baseUtils.metadataCache[metaKey]) {
+    if (!OEUtils.metadataCache[metaKey]) {
       var url = '/api/UIComponents/modelmeta/' + metaKey;
-      url = baseUtils.geturl(url);
+      url = OEUtils.geturl(url);
       xhttp.open('GET', url, true);
       xhttp.setRequestHeader('Content-Type', 'application/json;charset=encoding');
       //console.log('MetaPolymer sending req formetadata.json');
       xhttp.send();
     } else {
-      uimeta = baseUtils.metadataCache[metaKey];
+      uimeta = OEUtils.metadataCache[metaKey];
       populateModelDefCache(uimeta);
       //console.log('uimeta ', prototype.is, uimeta);
 
-      baseUtils.Metamorph(template, uimeta, prototype);
+      OEUtils.Metamorph(template, uimeta, prototype);
       regiterWithPolymer();
     }
 

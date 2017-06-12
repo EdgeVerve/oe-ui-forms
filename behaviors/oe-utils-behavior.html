@@ -6,7 +6,7 @@
 <link rel="import" href="../../polymer/polymer.html">
 
 <script>
-  var baseUtils = baseUtils || {};
+  var OEUtils = OEUtils || {};
 
   /* @polymerBehavior */
   var UtilsBehavior = {
@@ -20,7 +20,7 @@
       return lhs === rhs;
     },
     uiurl: function (url) {
-      var pre = baseUtils.uibaseroute || '';
+      var pre = OEUtils.uibaseroute || '';
       var post = url || '';
       if (!pre.endsWith('/')) {
         pre += '/';
@@ -33,6 +33,6 @@
   };
 
   /* @polymerBehavior */
-  baseUtils.UtilsBehavior = [UtilsBehavior];
+  OEUtils.UtilsBehavior = [UtilsBehavior];
 
 </script>
