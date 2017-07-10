@@ -1,5 +1,5 @@
 {
-  "name": "meta-polymer",
+  "name": "oe-ui-forms",
   "version": "0.8.0",
   "directories": {
     "test": "test"

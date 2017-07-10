@@ -1,11 +1,10 @@
 {
-  "name": "meta-polymer",
-  "main": "meta-polymer.html",
+  "name": "oe-ui-forms",
+  "main": "oe-ui-forms.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "oe-utils": "http://github.com/EdgeVerve/oe-utils.git",
-    "oe-ajax": "http://github.com/EdgeVerve/oe-ajax.git",
-    "oe-validators": "http://github.com/EdgeVerve/oe-validators.git"
+    "oe-ajax": "http://github.com/EdgeVerve/oe-ajax.git"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
