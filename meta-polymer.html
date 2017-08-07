@@ -663,7 +663,11 @@
                 templateCont.appendChild(parent);
               }
             } else {
-              parent = defaultInject;
+				if(node.hasAttribute('field-id')){
+					parent = defaultInject;
+				}else{
+					parent = templateCont;
+				}
             }
             parent.appendChild(node);
           }
