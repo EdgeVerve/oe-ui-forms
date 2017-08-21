@@ -22,13 +22,22 @@
 
   <link rel="import" href="../../iron-ajax/iron-ajax.html">
 
-  <link rel="import" href="../../oe-validators/behaviors/oe-form-validation-behavior.html">
-  <link rel="import" href="../../oe-validators/behaviors/oe-model-handler.html">
   <link rel="import" href="../../oe-input/oe-input.html">
   <link rel="import" href="../../oe-date/oe-date.html">
   <link rel="import" href="../../oe-input/oe-decimal.html">
 
-  <link rel="import" href="../../oe-validators/oe-validators.html">
+  <link rel="import" href="../behaviors/oe-form-messages-behavior.html">
+  <link rel="import" href="../behaviors/oe-form-validation-behavior.html">
+  <link rel="import" href="../behaviors/oe-model-handler.html">
+  <link rel="import" href="../behaviors/oe-utils-behavior.html">
+  <link rel="import" href="../validators/oe-async-validator.html">
+  <link rel="import" href="../validators/oe-block-validator.html">
+  <link rel="import" href="../validators/oe-combination-validator.html">
+  <link rel="import" href="../validators/oe-eq-validator.html">
+  <link rel="import" href="../validators/oe-expression-validator.html">
+  <link rel="import" href="../validators/oe-le-validator.html">
+  <link rel="import" href="../validators/oe-lt-validator.html">
+  <link rel="import" href="../validators/oe-ne-validator.html">
 
   <script>
     var masterMetadata = {
@@ -340,7 +349,7 @@
       'data-info-attribute': 'test'
     }];
     masterMetadata.excludeFields = ['comments'];
-    masterMetadata.evValidations = [{
+    masterMetadata.oeValidations = [{
       type: 'oe-eq-validator',
       fields: ['pf', 'reenter_pf'],
       error: 'fields-should-be-equal'
@@ -381,7 +390,7 @@
 
     masterMetadata.content =
       '<oe-field data-content="true" field-id="revisionDates"></oe-field><oe-field data-content="true" oe-container="main" field-id="dateOfBirth"></oe-field><oe-field data-content="true" oe-container="another" field-id="rankings"></oe-field>';
-    var EV = EV || {};
+    var OEUtils = OEUtils || {};
     OEUtils.metadataCache = OEUtils.metadataCache || {};
     OEUtils.metadataCache['employee-form'] = masterMetadata;
 
@@ -555,11 +564,11 @@
 
     server.respondWith(restServer.getHandler());
 
-    if (OEUtils.geturl) {
+//    if (OEUtils.geturl) {
       OEUtils.geturl = function (url) {
         return url;
       }
-    }
+//    }
 
   </script>
 
@@ -570,6 +579,7 @@
   <link rel="import" href="../lazy-component.html">
 
   <script>
+    window.OEUtils.TypeMappings = window.OEUtils.TypeMappings || {};
     window.OEUtils.TypeMappings.string = {
       type: 'string',
       uiType: 'oe-input',
@@ -1389,8 +1399,8 @@
 
         test('generated form has validation elements', function (done) {
           var element = fixture('simple');
-          for (var i = 0; i < masterMetadata.evValidations.length; i++) {
-            var validation = masterMetadata.evValidations[i];
+          for (var i = 0; i < masterMetadata.oeValidations.length; i++) {
+            var validation = masterMetadata.oeValidations[i];
             var validator = Polymer.dom(element.root).querySelector(validation.type);
             expect(validator).to.exist;
             expect(validator.validate).to.be.a.function;
