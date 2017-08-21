@@ -57,8 +57,8 @@
     }
   };
 
-  OEUtils.TypeMappings = {
-    date: {
+  OEUtils.TypeMappings = OEUtils.TypeMappings || {};
+  OEUtils.TypeMappings.date = OEUtils.TypeMappings.date || {
       uiType: 'oe-date',
       formatter: function (value, options) {
         if (!value) {
@@ -67,8 +67,9 @@
         var format = (options && options.format) ? options.format : 'DD MMM YYYY';
         return OEUtils.DateUtils.format(value, format);
       }
-    },
-    timestamp: {
+  };
+  
+  OEUtils.TypeMappings.timestamp = OEUtils.TypeMappings.timestamp || {
       uiType: 'oe-datetime',
       formatter: function (value, options) {
         if (!value) {
@@ -77,18 +78,18 @@
         var format = (options && options.format) ? options.format : 'DD MMM YYYY';
         return OEUtils.DateUtils.format(value, format);
       }
-    },
-    string: {
+  };
+  OEUtils.TypeMappings.string = OEUtils.TypeMappings.string || {
       uiType: 'oe-input'
-    },
-    integer: {
+  };
+  OEUtils.TypeMappings.integer = OEUtils.TypeMappings.integer || {
       uiType: 'oe-input',
       attributes: [{
         name: 'type',
         value: 'number'
       }]
-    },
-    number: {
+  };
+  OEUtils.TypeMappings.number = OEUtils.TypeMappings.number || {
       uiType: 'oe-decimal',
       formatter: function (value, options) {
         return ((value !== null && value !== undefined) && (options && options.precision)) ? Number(value).toLocaleString(
@@ -97,24 +98,24 @@
             maximumFractionDigits: options.precision
           }) : value;
       }
-    },
-    boolean: {
+  };
+  OEUtils.TypeMappings.boolean = OEUtils.TypeMappings.boolean || {
       uiType: 'oe-checkbox'
-    },
-    combo: {
+  };
+  OEUtils.TypeMappings.combo = OEUtils.TypeMappings.combo || {
       uiType: 'oe-combo',
       formatter: dropdownFormatter
-    },
-    tags: {
+  };
+  OEUtils.TypeMappings.tags = OEUtils.TypeMappings.tags || {
       uiType: 'oe-paper-chip'
-    },
-    list: {
+  };
+  OEUtils.TypeMappings.list = OEUtils.TypeMappings.list || {
       uiType: 'oe-list'
-    },
-    grid: {
+  };
+  OEUtils.TypeMappings.grid = OEUtils.TypeMappings.grid || {
       uiType: 'oe-data-table'
-    },
-    object: {
+  };
+  OEUtils.TypeMappings.object = OEUtils.TypeMappings.object || {
       uiType: 'oe-json-input',
       formatter: function (value, options) { // eslint-disable-line no-unused-vars
         if (value && typeof value === 'object') {
@@ -122,17 +123,16 @@
         }
         return value;
       }
-    },
-    objectid: {
+  };
+  OEUtils.TypeMappings.objectid = OEUtils.TypeMappings.objectid || {
       uiType: 'oe-input'
-    },
-    typeahead: {
+  };
+  OEUtils.TypeMappings.typeahead = OEUtils.TypeMappings.typeahead || {
       uiType: 'oe-typeahead',
       formatter: dropdownFormatter
-    },
-    documentdata: {
+  };
+  OEUtils.TypeMappings.documentdata = OEUtils.TypeMappings.documentdata || {
       uiType: 'oe-document-data'
-    }
   };
 
   (function () {
