@@ -68,7 +68,6 @@
         return OEUtils.DateUtils.format(value, format);
       }
   };
-  
   OEUtils.TypeMappings.timestamp = OEUtils.TypeMappings.timestamp || {
       uiType: 'oe-datetime',
       formatter: function (value, options) {
@@ -213,13 +212,31 @@
   OEUtils.Metamorph = function (template, uimeta, prototype) {
     var templateCont = template.content;
 
+    function _getModelDefaultVM(modelName, models) {
+      var defaultVM = {};
+      var model = models[modelName];
+      if(model) {
+        for(var propName in model.properties){
+          var propData = model.properties[propName];
+          if(propData.default !== undefined){
+            defaultVM[propName] = propData.default;
+          }
+          if(propData.type === 'boolean'){
+            defaultVM[propName] = propData.default || false;
+          } else if(propData.type === 'model'){
+            defaultVM[propName] = _getModelDefaultVM(propData.modeltype, models);
+          }
+        }
+      }
+      return defaultVM;
+    }
+    
     function camelCaseToLabel(s) {
       //Make the first character uppercase before split/join.
       return (s.charAt(0).toUpperCase() + s.slice(1)).split(/(?=[A-Z])/).join(' ');
     }
 
     var empty = document.createElement('template');
-
     function createNodeForElement(type) {
       var str = '<' + type + '></' + type + '>';
       empty.innerHTML = str;
@@ -663,11 +680,11 @@
                 templateCont.appendChild(parent);
               }
             } else {
-				if(node.hasAttribute('field-id')){
-					parent = defaultInject;
-				}else{
-					parent = templateCont;
-				}
+              if(node.hasAttribute('field-id')){
+                parent = defaultInject;
+              }else{
+                parent = templateCont;
+              }
             }
             parent.appendChild(node);
           }
@@ -886,26 +903,69 @@
             return;
           }
 
-          setValue(defaultVM, fieldId, fmeta.default);
+          //TODO - If fmeta.type==='model' and model with fmeta.modeltype is available
+          //extract defaults for that model and set the default value
+          setValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
+
           if (controlsByField[fieldId]) {
             return;
           }
 
-          var node = createNodeForMetaDefn(fmeta);
-          if (!node) {
-            //console.log('node is null');
+          var nodesForField = [];
+          if(fmeta.type === 'model' && !fmeta.uitype) {
+            //render a composite field as multiple controls
+            setValue(defaultVM, fieldId, _getModelDefaultVM(fmeta.modeltype, uimeta.metadata.models));
+            var subModelMeta = uimeta.metadata.models[fmeta.modeltype];
+            subModelMeta = subModelMeta && subModelMeta.properties ? subModelMeta.properties : {};
+            
+            for(var subField in subModelMeta) {
+              var subFieldMeta = findFieldMeta(subField, subModelMeta, uimeta);
+              subFieldMeta.label = subFieldMeta.label || camelCaseToLabel(subField);
+              
+              if(!subFieldMeta.uitype) {
+                if(subFieldMeta.in) {
+                  subFieldMeta.type = 'combo';
+                  subFieldMeta.listdata = subFieldMeta.in;                  
+                } else if(subFieldMeta.enumtype || subFieldMeta.refcodetype) {
+                  subFieldMeta.type = 'combo';
+                  subFieldMeta.displayproperty = 'description';
+                  subFieldMeta.valueproperty = 'code';
+                  var relatedModel = uimeta.metadata.models[subFieldMeta.enumtype || subFieldMeta.refcodetype];
+                  subFieldMeta.listurl = relatedModel?relatedModel.resturl:undefined;
+                } else if(subFieldMeta.type === 'array') {
+                  if (subFieldMeta.itemtype === 'model') {
+                    subFieldMeta.type = 'grid';
+                    subFieldMeta.subModelMeta = uimeta.metadata.models[subFieldMeta.modeltype].properties;
+                  } else {
+                    subFieldMeta.type = 'tags';
+                  }
+                }
+              }
+
+              var node = createNodeForMetaDefn(subFieldMeta);
+              if(node) {
+                nodesForField.push({fieldId: fieldId+'.'+subField, node: node, fieldMeta: subFieldMeta});
+              }
+            }
           } else {
+            var node = createNodeForMetaDefn(fmeta);
+            if(node) {
+              nodesForField.push({fieldId: fieldId, node: node, fieldMeta: fmeta});
+            }
+          }
+
+          nodesForField.forEach(function(item){
             var container;
-            setAttributesOnNode(node, fieldId, fmeta, uimeta, defaultInject, false);
-            if (fmeta.container) {
+            setAttributesOnNode(item.node, item.fieldId, item.fieldMeta, uimeta, defaultInject, false);
+            if (item.fieldMeta.container) {
               if (templateCont.getElementById) {
-                container = templateCont.getElementById(fmeta.container);
+                container = templateCont.getElementById(item.fieldMeta.container);
               } else {
-                container = templateCont.querySelector('#' + fmeta.container);
+                container = templateCont.querySelector('#' + item.fieldMeta.container);
               }
               container = container || defaultInject;
               // if fmeta.container not defined and node type is oe-DATA-TABLE then the grid should render in grids container of default form
-            } else if (node.nodeName === 'OE-DATA-TABLE') {
+            } else if (item.node.nodeName === 'OE-DATA-TABLE') {
               if (templateCont.getElementById) {
                 container = templateCont.getElementById('grids');
               } else {
@@ -915,13 +975,12 @@
             } else {
               container = defaultInject;
             }
-            container.appendChild(node);
-            controlsByField[fieldId] = controlsByField[fieldId] || [];
-            controlsByField[fieldId].push(node);
-          }
+            container.appendChild(item.node);
+            controlsByField[item.fieldId] = controlsByField[item.fieldId] || [];
+            controlsByField[item.fieldId].push(item.node);
+          });
         });
       }
-
 
       var oeValidations = uimeta.oeValidations || [];
       //append validations
