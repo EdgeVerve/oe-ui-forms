@@ -632,9 +632,8 @@
     function mixmeta(uimeta) {
       var defaultVM = {};
       var personalizedVM = {};
-      var modelAlias = uimeta.modelAlias;
+      uimeta.modelAlias = prototype.modelAlias || uimeta.modelAlias;
       uimeta.metadata = uimeta.metadata || {};
-      prototype.modelAlias = prototype.modelAlias || modelAlias;
       var modelMeta = uimeta.metadata.properties || {};
       Object.keys(modelMeta).forEach(function (fieldId) {
         var fmeta = modelMeta[fieldId] || {};
