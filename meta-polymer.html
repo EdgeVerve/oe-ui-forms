@@ -177,7 +177,13 @@
         this.set('meta', meta);
         this.set('modelAlias', meta.modelAlias);
         meta.metadata = meta.metadata || {};
-        this.set('resturl', meta.metadata.resturl);
+        var resturl = meta.resturl || meta.metadata.resturl;
+        if(resturl){
+          var urlIsSingular = (resturl.charAt(resturl.length-1) === '$');
+          resturl = urlIsSingular?resturl.substr(0,resturl.length-1):resturl;
+          this.set('urlIsSingular', urlIsSingular);
+          this.set('resturl', resturl);
+        }
         this.set('defaultVM', meta.defaultVM);
 
         this.set('_fieldsmeta', meta.metadata.properties);
@@ -233,6 +239,9 @@
     
     function camelCaseToLabel(s) {
       //Make the first character uppercase before split/join.
+      if(s.charAt(0) === '_'){
+        s = s.substr(1);
+      }
       return (s.charAt(0).toUpperCase() + s.slice(1)).split(/(?=[A-Z])/).join(' ');
     }
 
@@ -456,14 +465,14 @@
                 //    observer : '_fieldId_computed_value_observer(newVal,oldVal){vm.fieldId = newVal;};
                 //  }
 
-                var propName = '_' + uimeta.fieldid + '_computed_value';
+                var propName = '_' + fmeta.fieldId + '_computed_value';
                 var propConfig = {
                   computed: funcName + '(' + bindArgs + ')',
                   observer: propName + '_observer'
                 };
 
                 prototype[propName + '_observer'] = new Function('newVal', 'this.set("' + modelAlias + '.' +
-                  uimeta.fieldid + '",newVal);');
+                  fmeta.fieldId + '",newVal);');
                 prototype.properties = prototype.properties || {};
                 prototype.properties[propName] = propConfig;
                 bindingExpression = '[[' + propName + ']]';
@@ -902,9 +911,11 @@
             return;
           }
 
-          //TODO - If fmeta.type==='model' and model with fmeta.modeltype is available
-          //extract defaults for that model and set the default value
-          setValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
+          if(fmeta.type === 'model'){
+            setValue(defaultVM, fieldId, _getModelDefaultVM(fmeta.modeltype, uimeta.metadata.models));            
+          } else {
+            setValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
+          }
 
           if (controlsByField[fieldId]) {
             return;
@@ -913,7 +924,6 @@
           var nodesForField = [];
           if(fmeta.type === 'model' && !fmeta.uitype) {
             //render a composite field as multiple controls
-            setValue(defaultVM, fieldId, _getModelDefaultVM(fmeta.modeltype, uimeta.metadata.models));
             var subModelMeta = uimeta.metadata.models[fmeta.modeltype];
             subModelMeta = subModelMeta && subModelMeta.properties ? subModelMeta.properties : {};
             

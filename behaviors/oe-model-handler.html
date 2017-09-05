@@ -110,8 +110,12 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       emitOnSave: {
         type: String
       },
-      // if disableAutoFetch is true, modelHandler will not fetch the model, and caller can set model itself or set model
+      /* if disableAutoFetch is true, modelHandler will not fetch the model, and caller can set model itself or set model */
       disableAutoFetch: {
+        type: 'boolean'
+      },
+      /* When set to true, resturl is used as it is without appending :modelId*/
+      urlIsSingular: {
         type: 'boolean'
       },
       model: {
@@ -153,31 +157,32 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
     },
     _getURLForFetch: function () {
       var retUrl = this.resturl;
+      if(!this.urlIsSingular){
+        if (this.modelId) {
+          retUrl += '/' + this.modelId;
+        } else {
 
-      if (this.modelId) {
-        retUrl += '/' + this.modelId;
-      } else {
+          retUrl += '?';
+          var params = this._queryStringAsObject();
 
-        retUrl += '?';
-        var params = this._queryStringAsObject();
+          for (var criterion in params) {
+            retUrl += 'filter[where][' + criterion + ']=' + params[criterion] + '&';
+          }
 
-        for (var criterion in params) {
-          retUrl += 'filter[where][' + criterion + ']=' + params[criterion] + '&';
+          //remove ending & or ?
+          retUrl = retUrl.substr(0, retUrl.length - 1);
         }
 
-        //remove ending & or ?
-        retUrl = retUrl.substr(0, retUrl.length - 1);
-      }
-
-      if (this.includes && this.includes.length > 0) {
-        var includeFilters = this.includes.split(',');
-        retUrl += '?';
-        includeFilters.forEach(function (filter, index) {
-          retUrl += 'filter[include]=' + filter;
-          if ((index + 1) !== includeFilters.length) {
-            retUrl += '&';
-          }
-        });
+        if (this.includes && this.includes.length > 0) {
+          var includeFilters = this.includes.split(',');
+          retUrl += '?';
+          includeFilters.forEach(function (filter, index) {
+            retUrl += 'filter[include]=' + filter;
+            if ((index + 1) !== includeFilters.length) {
+              retUrl += '&';
+            }
+          });
+        }
       }
 
       return retUrl;
@@ -199,9 +204,8 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       ajaxCall.generateRequest();
     },
     doFetch: function (evt) {
-
       /*do not use evt as doFetch is used as observer also*/
-      if (!this.disableAutoFetch && this.resturl && (this.querystring || this.modelId)) {
+      if (!this.disableAutoFetch && this.resturl && (this.urlIsSingular || this.querystring || this.modelId)) {
         this._doFetch(evt);
       }
     },
@@ -214,7 +218,8 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       }
     },
     fetchList: function (callback) {
-      if (this.resturl) {
+      /* Must not call fetchList when url-is-singular */
+      if (!this.urlIsSingular && this.resturl) {
         var ajaxCall = document.createElement('oe-ajax');
         ajaxCall.contentType = 'application/json';
         ajaxCall.handleAs = 'json';
@@ -261,7 +266,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
     },
     doSave: function (evt) {
       var self = this;
-      var button = evt.currentTarget;
+      var button = evt?evt.currentTarget:undefined;
       self.validateForm().then(function (status) {
         if (status.valid) {
           if (self.emitOnSave) {
@@ -380,10 +385,14 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
             var ajaxCall = document.createElement('oe-ajax');
             ajaxCall.contentType = 'application/json';
             ajaxCall.handleAs = 'json';
-            ajaxCall.url = self.resturl + '/' + model.id;
-            // If version is applicable, then do a delete on the right endpoint
-            if (model._version) {
-              ajaxCall.url = ajaxCall.url + '/' + model._version;
+            if(self.urlIsSingular){
+              ajaxCall.url = self.resturl;
+            } else {
+              ajaxCall.url = self.resturl + '/' + model.id;
+              // If version is applicable, then do a delete on the right endpoint
+              if (model._version) {
+                ajaxCall.url = ajaxCall.url + '/' + model._version;
+              }              
             }
             ajaxCall.method = 'DELETE';
             ajaxCall.body = model;
