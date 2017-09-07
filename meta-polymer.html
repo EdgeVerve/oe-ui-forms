@@ -150,6 +150,25 @@
     xhttp.send();
   })();
 
+  (function(){ 
+    var deepQuery = function(selector){
+      var result = this.querySelector(selector);
+      if(!result){
+        var templates = this.querySelectorAll('template');
+        for(var i = 0,len = templates.length;i<len;i++){
+          result =templates[i].content.deepQuery(selector);
+          if(result){
+            return result;
+          }
+        }
+      }else{
+        return result;
+      }
+    }
+    Element.prototype.deepQuery = deepQuery;
+    DocumentFragment.prototype.deepQuery = deepQuery;
+    Document.prototype.deepQuery = deepQuery;
+  })();
 
   // fields....
   //    field1
@@ -689,7 +708,7 @@
 
       if (templateCont) {
         // transfer uimeta.content to dom template
-        var defaultInject = templateCont.querySelector('#fields') || templateCont;
+        var defaultInject = templateCont.deepQuery('#fields') || templateCont;
         if (uimeta.content) {
           var tpl = document.createElement('template');
           tpl.innerHTML = uimeta.content;
@@ -701,7 +720,7 @@
               if (templateCont.getElementById) {
                 parent = templateCont.getElementById(containerName);
               } else {
-                parent = templateCont.querySelector('#' + containerName);
+                parent = templateCont.deepQuery('#' + containerName);
               }
               if (!parent) {
                 parent = document.createElement('div');
@@ -823,9 +842,9 @@
               setAttributesOnNode(node, fieldId, fmeta, uimeta, defaultInject, false);
               var cont;
               if (fmeta.container) {
-                cont = defaultInject.querySelector('#' + fmeta.container);
+                cont = defaultInject.deepQuery('#' + fmeta.container);
                 if (!cont) {
-                  cont = defaultInject.querySelector(fmeta.container);
+                  cont = defaultInject.deepQuery(fmeta.container);
                 }
               }
               if (cont) {
@@ -877,7 +896,7 @@
                 if (templateCont.getElementById) {
                   container = templateCont.getElementById(fmeta.container);
                 } else {
-                  container = templateCont.querySelector('#' + fmeta.container);
+                  container = templateCont.deepQuery('#' + fmeta.container);
                 }
                 if (!container) {
                   container = document.createElement('div');
@@ -998,7 +1017,7 @@
               if (templateCont.getElementById) {
                 container = templateCont.getElementById(item.fieldMeta.container);
               } else {
-                container = templateCont.querySelector('#' + item.fieldMeta.container);
+                container = templateCont.deepQuery('#' + item.fieldMeta.container);
               }
               container = container || defaultInject;
               // if fmeta.container not defined and node type is oe-DATA-TABLE then the grid should render in grids container of default form
@@ -1006,7 +1025,7 @@
               if (templateCont.getElementById) {
                 container = templateCont.getElementById('grids');
               } else {
-                container = templateCont.querySelector('#grids');
+                container = templateCont.deepQuery('#grids');
               }
               container = container || defaultInject;
             } else {
