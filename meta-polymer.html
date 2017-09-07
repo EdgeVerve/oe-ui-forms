@@ -607,6 +607,27 @@
             fmeta = {};
             modelMeta[fieldId] = fmeta;
           }
+          
+          if (fmeta.enumtype || fmeta.refcodetype) {
+            fmeta.type = 'combo';
+            fmeta.displayproperty = 'description';
+            fmeta.valueproperty = 'code';
+            if(uimeta.metadata.models[fmeta.enumtype || fmeta.refcodetype]){
+              fmeta.listurl = uimeta.metadata.models[fmeta.enumtype || fmeta.refcodetype].resturl;
+            }
+          } else if (fmeta.in) {
+            fmeta.type = 'combo';
+            fmeta.listdata = fmeta.in;
+          } else if (fmeta.type === 'array') {
+            if (fmeta.itemtype === 'model' && fmeta.modeltype) {
+              fmeta.type = 'grid';
+              if (uimeta.metadata.models[fmeta.modeltype]) {
+                fmeta.subModelMeta = uimeta.metadata.models[fmeta.modeltype].properties;
+              }
+            } else {
+              fmeta.type = 'tags';
+            }
+          }
         } else {
           fmeta = {};
         }
@@ -829,15 +850,16 @@
         uimeta.fields.forEach(function (fmeta) {
 
           if (typeof fmeta === 'string') {
-            fmeta = Object.assign({
+            fmeta = {
               fieldId: fmeta
-            }, modelMeta[fmeta]);
-          } else {
-            //is it?? ok to override modelMeta object with fields attributes
-            var mmeta = findFieldMeta(fmeta.fieldId, modelMeta, uimeta);
-            fmeta = Object.assign(mmeta, fmeta);
-            setValue(defaultVM, fieldId, fmeta.default);
-          }
+            };
+          } 
+          
+          //is it?? ok to override modelMeta object with fields attributes
+          var mmeta = findFieldMeta(fmeta.fieldId, modelMeta, uimeta);
+          fmeta = Object.assign(mmeta, fmeta);
+          setValue(defaultVM, fieldId, fmeta.default);
+          
           var fieldId = fmeta.fieldId;
 
           if (fieldId && excludeFields.indexOf(fieldId) !== -1) {
@@ -951,9 +973,15 @@
                 }
               }
 
-              var node = createNodeForMetaDefn(subFieldMeta);
-              if(node) {
-                nodesForField.push({fieldId: fieldId+'.'+subField, node: node, fieldMeta: subFieldMeta});
+              var compositeFieldId = fieldId+'.'+subField;
+              if(controlsByField[compositeFieldId] && controlsByField[compositeFieldId].length>0){
+                //composite field was already defined as part of fields and control is already available
+                
+              } else {
+                var node = createNodeForMetaDefn(subFieldMeta);
+                if(node) {
+                  nodesForField.push({fieldId: compositeFieldId, node: node, fieldMeta: subFieldMeta});
+                }                
               }
             }
           } else {
