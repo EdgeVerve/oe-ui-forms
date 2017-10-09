@@ -988,6 +988,8 @@
                     subFieldMeta.subModelMeta = uimeta.metadata.models[subFieldMeta.modeltype].properties;
                   } else {
                     subFieldMeta.type = 'tags';
+                  } else if (subFieldMeta.type === 'model') {
+				    subFieldMeta.type = 'object';
                   }
                 }
               }
