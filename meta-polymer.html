@@ -540,7 +540,7 @@
         if (!node.hasAttribute('value')) {
           if (modelAlias && fieldId && !fieldId.startsWith('@')) {
             var binding = '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}'; // eslint-disable-line no-redeclare
-            node.setAttribute('value', binding);
+            node.setAttribute(fmeta.bindAttribute || 'value', binding);
           }
         }
       } else {
