@@ -986,11 +986,11 @@
                   if (subFieldMeta.itemtype === 'model') {
                     subFieldMeta.type = 'grid';
                     subFieldMeta.subModelMeta = uimeta.metadata.models[subFieldMeta.modeltype].properties;
-                  } else if (subFieldMeta.type === 'model') {
-				            subFieldMeta.type = 'object';
                   } else {
                     subFieldMeta.type = 'tags';
                   }
+                } else if (subFieldMeta.type === 'model'){
+                  subFieldMeta.type = 'object';
                 }
               }
 
