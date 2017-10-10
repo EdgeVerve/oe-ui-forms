@@ -20,6 +20,30 @@
     return obj;
   };
 
+    /**
+     * Sets specified `value` on `target` going levels down if required.
+     * o:{},
+     *  setDeepValue(o, "x",5) -> o:{x:5}
+     *      setDeepValue(o, "y.z",6) -> o:{x:5,y:{z:6}}
+     *      setDeepValue(o, "y.k",7) -> o:{x:5,y:{z:6,k:7}}
+     */
+  OEUtils.setDeepValue = function (target, field, value) {
+      if (field) {
+        var fields = field.split('.');
+        var leaf = fields.pop();
+
+        var currentTarget = target;
+        fields.forEach(function _forEachCb(field) {
+          currentTarget[field] = currentTarget[field] || {};
+          currentTarget = currentTarget[field];
+        });
+
+        if (currentTarget) {
+          currentTarget[leaf] = value;
+        }
+      }
+    }
+
   OEUtils.createFunction = function (funcStr) {
     funcStr = funcStr.trim();
     if (funcStr.startsWith('function')) {
@@ -654,40 +678,17 @@
       return fmeta;
     }
 
-    /**
-     * Sets specified `value` on `target` going levels down if required.
-     * o:{},
-     *  setValue(o, "x",5) -> o:{x:5}
-     *      setValue(o, "y.z",6) -> o:{x:5,y:{z:6}}
-     *      setValue(o, "y.k",7) -> o:{x:5,y:{z:6,k:7}}
-     */
-    function setValue(target, field, value) {
-      if (field) {
-        var fields = field.split('.');
-        var leaf = fields.pop();
-
-        var currentTarget = target;
-        fields.forEach(function _forEachCb(field) {
-          currentTarget[field] = currentTarget[field] || {};
-          currentTarget = currentTarget[field];
-        });
-
-        if (value !== undefined) {
-          currentTarget[leaf] = value;
-        }
-      }
-    }
-
     function mixmeta(uimeta) {
       var defaultVM = {};
       var personalizedVM = {};
       uimeta.modelAlias = prototype.modelAlias || uimeta.modelAlias;
       uimeta.metadata = uimeta.metadata || {};
       var modelMeta = uimeta.metadata.properties || {};
+      uimeta.dynamicDefaults = uimeta.dynamicDefaults || [];
       Object.keys(modelMeta).forEach(function (fieldId) {
         var fmeta = modelMeta[fieldId] || {};
         fmeta.label = fmeta.label || camelCaseToLabel(fieldId);
-        setValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
+        OEUtils.setDeepValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
       });
 
       // field id in elements can be string -> fieldid
@@ -701,7 +702,11 @@
             fmeta.container = el.container;
             fmeta.order = el.order;
             fmeta.default = el.default !== undefined ? el.default : fmeta.default;
-            setValue(personalizedVM, fieldId, fmeta.default);
+            if(fmeta.default && fmeta.default.startsWith('@')){
+              uimeta.dynamicDefaults.push({field: fieldId, value: fmeta.default});
+            } else {
+              OEUtils.setDeepValue(personalizedVM, fieldId, fmeta.default);              
+            }
           }
         });
       }
@@ -877,7 +882,12 @@
           //is it?? ok to override modelMeta object with fields attributes
           var mmeta = findFieldMeta(fmeta.fieldId, modelMeta, uimeta);
           fmeta = Object.assign(mmeta, fmeta);
-          setValue(defaultVM, fieldId, fmeta.default);
+
+          if(fmeta.default && fmeta.default.startsWith('@')){
+            uimeta.dynamicDefaults.push({field: fmeta.fieldId, value: fmeta.default});
+          } else {
+            OEUtils.setDeepValue(defaultVM, fieldId, fmeta.default);              
+          }
           
           var fieldId = fmeta.fieldId;
 
@@ -953,9 +963,9 @@
           }
 
           if(fmeta.type === 'model'){
-            setValue(defaultVM, fieldId, _getModelDefaultVM(fmeta.modeltype, uimeta.metadata.models));            
+            OEUtils.setDeepValue(defaultVM, fieldId, _getModelDefaultVM(fmeta.modeltype, uimeta.metadata.models));            
           } else {
-            setValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
+            OEUtils.setDeepValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
           }
 
           if (controlsByField[fieldId]) {
@@ -1116,7 +1126,20 @@
       };
 
       prototype.properties[uimeta.modelAlias].value = prototype.properties[uimeta.modelAlias].value || function () {
-        return JSON.parse(JSON.stringify(uimeta.defaultVM));
+        var self = this;
+        var ret = JSON.parse(JSON.stringify(uimeta.defaultVM));
+        uimeta.dynamicDefaults && uimeta.dynamicDefaults.forEach(function(item){
+          if(item.value && item.value.startsWith('@w.')){
+            var fieldValue = OEUtils.deepValue(window, item.value.substr(3));
+            OEUtils.setDeepValue(ret, item.field, 
+                      fieldValue?JSON.parse(JSON.stringify(fieldValue)):fieldValue);
+          } else if(item.value && item.value.startsWith('@t.')){
+            OEUtils.setDeepValue(ret, item.field, 
+                      JSON.parse(JSON.stringify(self.get(item.value.substr(3))))
+            );            
+          }
+        });
+        return ret;
       };
 
       if (uimeta.polymerConfig) {
