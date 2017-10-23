@@ -485,7 +485,7 @@
                 });
                 bindingExpression = attributeValue;
               } else {
-                var funcName = '_' + fmeta.fieldId + '_' + attributeName;
+                var funcName = '_' + fmeta.fieldId.replace(new RegExp('\\.', 'g'), '_') + '_' + attributeName;
                 //expression
                 var funcArgs = chunkDetails.map(function (v) {
                   return v.variable;
@@ -886,7 +886,7 @@
           if(fmeta.default && fmeta.default.startsWith('@')){
             uimeta.dynamicDefaults.push({field: fmeta.fieldId, value: fmeta.default});
           } else {
-            OEUtils.setDeepValue(defaultVM, fieldId, fmeta.default);              
+            OEUtils.setDeepValue(defaultVM, fmeta.fieldId, fmeta.default);              
           }
           
           var fieldId = fmeta.fieldId;
@@ -1129,7 +1129,7 @@
 
       prototype.properties[uimeta.modelAlias].value = prototype.properties[uimeta.modelAlias].value || function () {
         var self = this;
-        var ret = JSON.parse(JSON.stringify(uimeta.defaultVM));
+        var ret = uimeta.defaultVM;//JSON.parse(JSON.stringify(uimeta.defaultVM));
         uimeta.dynamicDefaults && uimeta.dynamicDefaults.forEach(function(item){
           if(item.value && item.value.startsWith('@w.')){
             var fieldValue = OEUtils.deepValue(window, item.value.substr(3));
@@ -1141,7 +1141,7 @@
             );            
           }
         });
-        return ret;
+        return JSON.parse(JSON.stringify(ret));
       };
 
       if (uimeta.polymerConfig) {
