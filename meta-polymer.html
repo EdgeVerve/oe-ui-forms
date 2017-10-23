@@ -147,6 +147,15 @@
         return value;
       }
   };
+  OEUtils.TypeMappings.model = OEUtils.TypeMappings.model || {
+      uiType: 'oe-json-input',
+      formatter: function (value, options) { // eslint-disable-line no-unused-vars
+        if (value && typeof value === 'object') {
+          return JSON.stringify(value);
+        }
+        return value;
+      }
+  };
   OEUtils.TypeMappings.objectid = OEUtils.TypeMappings.objectid || {
       uiType: 'oe-input'
   };
@@ -555,7 +564,7 @@
         }
       }
 
-      if (fmeta.type !== 'grid') {
+      if (fmeta.type !== 'grid' || (fmeta.uitype && fmeta.uitype !== 'oe-data-table')) {
 
         /*if (!fmeta.class) {
         	node.classList.add('evfield');
@@ -568,31 +577,13 @@
           }
         }
       } else {
-        if (node.nodeName === 'OE-GRID') {
-          fmeta.columnDefs = [];
-          Object.keys(fmeta.subModelMeta).forEach(function (prop) {
-            var type = window.OEUtils.TypeMappings[fmeta.subModelMeta[prop].type] || 'string';
-            var col = {
-              field: prop,
-              headerName: camelCaseToLabel(prop),
-              uitype: type.uiType
-            };
-            fmeta.columnDefs.push(col);
-          });
-          node.setAttribute('columndefs', JSON.stringify(columnDefs)); // eslint-disable-line no-undef
-          fieldId && node.setAttribute('rowdata', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
-          node.setAttribute('dialogmetadata', fmeta.modeltype);
-          node.setAttribute('gridIdentifier', fmeta.modeltype);
-        } else {
-
-          var recordHandling = 'local';
-          //node.setAttribute('columns', '[[fields.' + fieldId + '.columns]]');
-          node.setAttribute('model', fmeta.modeltype);
-          fieldId && node.setAttribute('items', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
-          node.setAttribute('editor-form-url', '/api/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
-            '-form.html');
-          node.setAttribute('record-handling', recordHandling);
-        }
+        var recordHandling = 'local';
+        //node.setAttribute('columns', '[[fields.' + fieldId + '.columns]]');
+        node.setAttribute('model', fmeta.modeltype);
+        fieldId && node.setAttribute('items', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
+        node.setAttribute('editor-form-url', '/api/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
+          '-form.html');
+        node.setAttribute('record-handling', recordHandling);
       }
 
       if (fmeta.textContent) {
@@ -996,11 +987,11 @@
                   if (subFieldMeta.itemtype === 'model') {
                     subFieldMeta.type = 'grid';
                     subFieldMeta.subModelMeta = uimeta.metadata.models[subFieldMeta.modeltype].properties;
-                  } else if (subFieldMeta.type === 'model') {
-				            subFieldMeta.type = 'object';
                   } else {
                     subFieldMeta.type = 'tags';
                   }
+                } else if (subFieldMeta.type === 'model'){
+                  subFieldMeta.type = 'object';
                 }
               }
 
