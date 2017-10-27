@@ -713,11 +713,7 @@
             var containerName = node.getAttribute('oe-container');
             var parent = null;
             if (containerName) {
-              if (templateCont.getElementById) {
-                parent = templateCont.getElementById(containerName);
-              } else {
-                parent = templateCont.deepQuery('#' + containerName);
-              }
+              parent = templateCont.deepQuery('#' + containerName);
               if (!parent) {
                 parent = document.createElement('div');
                 parent.setAttribute('id', containerName);
@@ -894,11 +890,7 @@
             } else {
               var container;
               if (fmeta.container) {
-                if (templateCont.getElementById) {
-                  container = templateCont.getElementById(fmeta.container);
-                } else {
-                  container = templateCont.deepQuery('#' + fmeta.container);
-                }
+                container = templateCont.deepQuery('#' + fmeta.container);
                 if (!container) {
                   container = document.createElement('div');
                   container.setAttribute('id', fmeta.container);
@@ -1017,19 +1009,11 @@
             var container;
             setAttributesOnNode(item.node, item.fieldId, item.fieldMeta, uimeta, defaultInject, false);
             if (item.fieldMeta.container) {
-              if (templateCont.getElementById) {
-                container = templateCont.getElementById(item.fieldMeta.container);
-              } else {
-                container = templateCont.deepQuery('#' + item.fieldMeta.container);
-              }
+              container = templateCont.deepQuery('#' + item.fieldMeta.container);
               container = container || defaultInject;
               // if fmeta.container not defined and node type is oe-DATA-TABLE then the grid should render in grids container of default form
             } else if (item.node.nodeName === 'OE-DATA-TABLE') {
-              if (templateCont.getElementById) {
-                container = templateCont.getElementById('grids');
-              } else {
-                container = templateCont.deepQuery('#grids');
-              }
+              container = templateCont.deepQuery('#grids');
               container = container || defaultInject;
             } else {
               container = defaultInject;
