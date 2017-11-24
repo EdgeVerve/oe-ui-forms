@@ -12,6 +12,7 @@
   var OEUtils = window.OEUtils;
   OEUtils.metadataCache = OEUtils.metadataCache || {};
   OEUtils.modelDefCache = OEUtils.modelDefCache || {};
+  var restApiRoot = (window.OEUtils && window.OEUtils.restApiRoot) ? window.OEUtils.restApiRoot : '/api';
 
   OEUtils.deepValue = function (obj, path) {
     for (var i = 0, path = path.split('.'), len = path.length; obj && i < len; i++) { // eslint-disable-line no-redeclare
@@ -177,7 +178,7 @@
         });
       }
     };
-    var url = OEUtils.geturl('/api/TypeMappings');
+    var url = OEUtils.geturl(restApiRoot + '/TypeMappings');
     xhttp.open('GET', url, true);
     xhttp.setRequestHeader('Content-Type', 'application/json;charset=encoding');
     xhttp.send();
@@ -260,7 +261,7 @@
           done(null, OEUtils.modelDefCache[model]);
         }
       };
-      var url = OEUtils.geturl('/api/ModelDefinitions/modelmeta/' + model);
+      var url = OEUtils.geturl(restApiRoot + '/ModelDefinitions/modelmeta/' + model);
       xhttp.open('GET', url, true);
       xhttp.setRequestHeader('Content-Type', 'application/json;charset=encoding');
       xhttp.send();
@@ -581,7 +582,7 @@
         //node.setAttribute('columns', '[[fields.' + fieldId + '.columns]]');
         node.setAttribute('model', fmeta.modeltype);
         fieldId && node.setAttribute('items', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
-        node.setAttribute('editor-form-url', '/api/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
+        node.setAttribute('editor-form-url', restApiRoot + '/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
           '-form.html');
         node.setAttribute('record-handling', recordHandling);
       }
@@ -870,7 +871,7 @@
           var mmeta = findFieldMeta(fmeta.fieldId, modelMeta, uimeta);
           fmeta = Object.assign(mmeta, fmeta);
 
-          if(fmeta.default && fmeta.default.startsWith('@')){
+          if(fmeta.default && fmeta.default.startsWith && fmeta.default.startsWith('@')){
             uimeta.dynamicDefaults.push({field: fmeta.fieldId, value: fmeta.default});
           } else {
             OEUtils.setDeepValue(defaultVM, fmeta.fieldId, fmeta.default);              
@@ -1169,7 +1170,7 @@
     }
 
     if (!OEUtils.metadataCache[metaKey]) {
-      var url = '/api/UIComponents/modelmeta/' + metaKey;
+      var url = restApiRoot + '/UIComponents/modelmeta/' + metaKey;
       url = OEUtils.geturl(url);
       xhttp.open('GET', url, true);
       xhttp.setRequestHeader('Content-Type', 'application/json;charset=encoding');
