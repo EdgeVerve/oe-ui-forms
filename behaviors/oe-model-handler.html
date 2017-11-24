@@ -452,7 +452,8 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       ajaxCall.contentType = 'application/json';
       ajaxCall.handleAs = 'json';
 
-      var wfurl = '/api/TaskManager/complete';
+      var restApiRoot = (window.OEUtils && window.OEUtils.restApiRoot) ? window.OEUtils.restApiRoot : '/api';
+      var wfurl = restApiRoot + '/TaskManager/complete';
       //TODO - Arrive at appropriate URL, METHOD and BODY
       ajaxCall.url = wfurl;
       ajaxCall.method = 'POST';

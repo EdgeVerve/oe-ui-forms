@@ -1165,7 +1165,10 @@
           expect(component.employee).to.exist;
           expect(typeof component.employee).to.equal('object');
           expect(component.employee).to.not.equal(component.defaultVM);
-          expect(component.employee).to.deep.equal(component.defaultVM);
+          expect(Object.keys(component.defaultVM)).to.include.deep.members(Object.keys(component.employee));
+          Object.keys(component.employee).forEach(function(prop){
+            expect(component.defaultVM[prop]).to.deep.equal(component.employee[prop]);
+          });
           done();
         });
       });
