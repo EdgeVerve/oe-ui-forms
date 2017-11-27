@@ -1,0 +1,94 @@
+<!-- 
+  ©2016-2017 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),
+  Bangalore, India. All Rights Reserved.
+-->
+
+<script>
+  var OEUtils = OEUtils || {};
+
+  /** @polymerBehavior OEUtils.ScreenFlowBehavior */
+  OEUtils.ScreenFlowBehavior = {
+    _makeAjaxCall: function (url, method, body, header, params, ajaxProps, cb) {
+
+      ajaxProps = ajaxProps || {};
+      if (!cb && typeof ajaxProps === 'function') {
+        cb = ajaxProps;
+        ajaxProps = {};
+      }
+
+      var ajax = document.createElement('oe-ajax');
+      ajax.contentType = ajaxProps.contentType || 'application/json';
+      ajax.handleAs = ajaxProps.handleAs || 'json';
+      ajax.url = url;
+      ajax.method = method.toUpperCase();
+      if (ajax.method == 'GET') {
+        params = params || {};
+        params.filter = params.filter || {};
+        params.filter.scope = {};
+      }
+      if (params) {
+        if (params.filter) {
+          params.filter = JSON.stringify(params.filter);
+        }
+        ajax.params = params;
+      }
+      if (body) {
+        delete body._scope;
+        delete body.score;
+        ajax.body = JSON.stringify(body);
+      }
+
+      if (header) {
+        Object.keys(header).forEach(function (k) {
+          var val = header[k];
+          if (Array.isArray(val)) {
+            ajax.headers[k] = val[0]
+          } else {
+            ajax.headers[k] = val
+          }
+
+        })
+      }
+
+      ajax.addEventListener('response', function (event) {
+        // this.fire('end-spinner');
+        if (cb) {
+          cb(null, event.detail.response);
+        }
+      }.bind(this));
+      ajax.addEventListener('error', function (err) {
+        // this.fire('end-spinner');
+        if (cb) {
+          cb(err);
+        }
+      }.bind(this));
+      // //this event should cause an overlay so that othe actions can be disabled.
+      // this.fire('start-spinner', {
+      //   url: ajax.url
+      // });
+      ajax.generateRequest();
+    },
+    _executeRule: function(ruleName, ruleInput, cb){
+      var restApiRoot = (window.OEUtils && window.OEUtils.restApiRoot) ? window.OEUtils.restApiRoot : '/api';
+      var ruleURL = restApiRoot + '/DecisionTables/exec/'+ruleName;
+      this._makeAjaxCall(ruleURL, 'POST', ruleInput, null, null, function(err, resp){
+        cb(err, resp);
+      }.bind(this));
+    },
+    doConditionalNavigate: function (evt) {
+      var ruleName = evt.currentTarget.dataset.ruleName;//data-rule-name
+      var ruleInput = this[evt.currentTarget.dataset.ruleInput || this.modelAlias];//data-rule-input
+      this._executeRule(ruleName, ruleInput, function(err, resp){
+        window.oe_navigate_to(resp.URL, this[this.modelAlias]);
+      });
+    },
+    doNavigate: function (evt) {
+      var path = evt.currentTarget.dataset.url;
+      var targetName = (evt.currentTarget.dataset.stateTarget || this.modelAlias);
+      var state = {};
+      state[targetName] = this[evt.currentTarget.dataset.stateSource || this.modelAlias];
+      window.oe_navigate_to(path, state);
+    }
+  };
+
+</script>
