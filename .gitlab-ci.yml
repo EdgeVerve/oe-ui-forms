@@ -36,3 +36,8 @@ test-chrome:
   variables:
     BROWSER: "firefox"
   <<: *run_script
+
+test-ie:
+  variables:
+    BROWSER: "ie"
+  <<: *run_script
