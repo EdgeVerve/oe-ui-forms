@@ -93,6 +93,12 @@
       self.ajaxCall = ajaxCall;
       self.fire('register-validator', this.fields);
     },
+    _deepValue: function (obj, path) {
+      for (var i = 0, path = path.split('.'), len = path.length; obj && i < len; i++) { // eslint-disable-line no-redeclare
+        obj = obj[path[i]];
+      }
+      return obj;
+    },
     validate: function () {
       var self = this;
 
@@ -106,7 +112,7 @@
         if (requesturl) {
           for (var idx in self.fields) {
             var field = self.fields[idx];
-            var value = self.model[field];
+            var value = self._deepValue(self.model,field);
             requesturl = requesturl.replace(new RegExp('\\[' + field + '\\]', 'g'), value);
           }
           self.ajaxCall.url = requesturl;
