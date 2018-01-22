@@ -711,7 +711,11 @@
             Object.keys(modelMeta).forEach(function(fieldId) {
                 var fmeta = modelMeta[fieldId] || {};
                 fmeta.label = fmeta.label || camelCaseToLabel(fieldId);
-                OEUtils.setDeepValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
+                if(fmeta.type == 'model'){
+                    OEUtils.setDeepValue(defaultVM, fieldId, _getModelDefaultVM(fmeta.modeltype, uimeta.metadata.models));
+                }else{
+                    OEUtils.setDeepValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
+                }
             });
 
             // field id in elements can be string -> fieldid
