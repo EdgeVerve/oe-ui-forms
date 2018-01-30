@@ -77,11 +77,12 @@
         valid: true
       };
       if (!this.errors || this.errors.length === 0) {
-        for (var fieldId in this.fieldControls) {
-          this.fieldControls[fieldId].forEach(function (control) {
+        var self = this;
+        Object.keys(this.fieldControls).forEach(function(fieldId) {
+          self.fieldControls[fieldId].forEach(function (control) {
             control.validate && control.validate();
           });
-        }
+        });
 
         //Ideally, oe-field-ok raised by control.validate() will
         //trigger cross-field-validations. So we don't need below.

@@ -84,7 +84,7 @@
     validate: function () {
       var values = [];
 
-      for (var idx in this.fields) {
+      for(var idx = 0; idx < this.fields.length; idx++) {
         var value = this._deepValue(this.model, this.fields[idx]);
         values.push(value);
       }

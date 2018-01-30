@@ -110,7 +110,7 @@
         //however if special handling is required, something
         //similar to below can be done.
         if (requesturl) {
-          for (var idx in self.fields) {
+          for (var idx = 0; idx < self.fields.length; idx++) {
             var field = self.fields[idx];
             var value = self._deepValue(self.model,field);
             requesturl = requesturl.replace(new RegExp('\\[' + field + '\\]', 'g'), value);

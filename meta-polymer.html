@@ -284,7 +284,7 @@
             var defaultVM = {};
             var model = models[modelName];
             if (model) {
-                for (var propName in model.properties) {
+                Object.keys(model.properties).forEach(function(propName) {
                     var propData = model.properties[propName];
                     if (propData.default !== undefined) {
                         defaultVM[propName] = propData.default;
@@ -294,7 +294,7 @@
                     } else if (propData.type === 'model') {
                         defaultVM[propName] = _getModelDefaultVM(propData.modeltype, models);
                     }
-                }
+                });
             }
             return defaultVM;
         }
@@ -374,11 +374,11 @@
         function getPrimaryKey(uimeta) {
             var primaryKey = 'id';
             if (uimeta) {
-                for (var prop in uimeta.metadata.properties) {
+                Object.keys(uimeta.metadata.properties).forEach(function(prop) {
                     if (uimeta.metadata.properties[prop].id) {
                         primaryKey = prop;
                     }
-                }
+                });
                 return primaryKey;
             }
             return primaryKey;
@@ -1003,7 +1003,7 @@
                         var subModelMeta = uimeta.metadata.models[fmeta.modeltype];
                         subModelMeta = subModelMeta && subModelMeta.properties ? subModelMeta.properties : {};
 
-                        for (var subField in subModelMeta) {
+                        Object.keys(subModelMeta).forEach(function(subField) {
                             var subFieldMeta = findFieldMeta(subField, subModelMeta, uimeta);
                             subFieldMeta.label = subFieldMeta.label || camelCaseToLabel(subField);
 
@@ -1043,7 +1043,7 @@
                                     });
                                 }
                             }
-                        }
+                        });
                     } else {
                         var node = createNodeForMetaDefn(fmeta);
                         if (node) {
@@ -1077,7 +1077,7 @@
 
             var oeValidations = uimeta.oeValidations || [];
             //append validations
-            for (i in oeValidations) {
+            for(i = 0; i < oeValidations.length; i++) {
                 var validation = oeValidations[i];
 
                 var validationElement = createNodeForElement(validation.type);
@@ -1142,7 +1142,7 @@
             prototype.behaviors = prototype.behaviors || [];
             prototype.behaviors.push(OEUtils.MetaBehavior);
             prototype.behaviors.push(OEUtils.UtilsBehavior);
-            // Incase form valodation behaviors are defined in the metapolymer add '_clearAllErrors' 
+            // Incase form valodation behaviors are defined in the metapolymer add '_clearAllErrors'
             if (prototype.behaviors.indexOf(OEUtils.FormValidationBehavior) >= 0) {
                 prototype.observers = prototype.observers || [];
                 prototype.observers.push('_clearAllErrors(' + uimeta.modelAlias + ')');
@@ -1172,22 +1172,23 @@
             };
 
             if (uimeta.polymerConfig) {
-                for (var i in uimeta.polymerConfig.behaviors) {
+                for(var i = 0; i < uimeta.polymerConfig.behaviors.length; i++) {
                     prototype.behaviors.push(OEUtils.deepValue(window, uimeta.polymerConfig.behaviors[i]));
                 }
 
-                for (var funcName in uimeta.polymerConfig.functions) {
+                Object.keys(uimeta.polymerConfig.functions).forEach(function(funcName) {
                     prototype[funcName] = OEUtils.createFunction(uimeta.polymerConfig.functions[funcName]);
-                }
+                });
 
-                for (var propName in uimeta.polymerConfig.properties) {
+                Object.keys(uimeta.polymerConfig.properties).forEach(function(propName) {
                     prototype.properties = prototype.properties || {};
                     prototype.properties[propName] = uimeta.polymerConfig.properties[propName];
-                }
-                for (var eventName in uimeta.polymerConfig.listeners) {
+                });
+
+                Object.keys(uimeta.polymerConfig.listeners).forEach(function(eventName) {
                     prototype.listeners = prototype.listeners || {};
                     prototype.listeners[eventName] = uimeta.polymerConfig.listeners[eventName];
-                }
+                });
             }
 
             Polymer(prototype);

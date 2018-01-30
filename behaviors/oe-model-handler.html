@@ -165,9 +165,9 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           retUrl += '?';
           var params = this._queryStringAsObject();
 
-          for (var criterion in params) {
+          Object.keys(params).forEach(function(criterion) {
             retUrl += 'filter[where][' + criterion + ']=' + params[criterion] + '&';
-          }
+          });
 
           //remove ending & or ?
           retUrl = retUrl.substr(0, retUrl.length - 1);
@@ -312,11 +312,11 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       function findKey() {
         var uniqueKey = 'id';
         if (self.meta) {
-          for (var prop in self.meta.metadata.properties) {
+          Object.keys(self.meta.metadata.properties).forEach(function(prop) {
             if (self.meta.metadata.properties[prop].id) {
               uniqueKey = prop;
             }
-          }
+          });
           return uniqueKey;
         }
         return uniqueKey;
@@ -392,7 +392,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
               // If version is applicable, then do a delete on the right endpoint
               if (model._version) {
                 ajaxCall.url = ajaxCall.url + '/' + model._version;
-              }              
+              }
             }
             ajaxCall.method = 'DELETE';
             ajaxCall.body = model;
