@@ -233,12 +233,25 @@
                 this.set('meta', meta);
                 this.set('modelAlias', meta.modelAlias);
                 meta.metadata = meta.metadata || {};
-                var resturl = meta.resturl || meta.metadata.resturl;
-                if (resturl) {
-                    var urlIsSingular = (resturl.charAt(resturl.length - 1) === '$');
-                    resturl = urlIsSingular ? resturl.substr(0, resturl.length - 1) : resturl;
-                    this.set('urlIsSingular', urlIsSingular);
-                    this.set('resturl', resturl);
+                if(!this.resturl){
+                  this.set('resturl', meta.resturl || meta.metadata.resturl);
+                }
+                meta.geturl && this.set('geturl', meta.geturl);
+                meta.posturl && this.set('posturl', meta.posturl);
+                meta.puturl && this.set('puturl', meta.puturl);
+                meta.deleteurl && this.set('deleteurl', meta.deleteurl);
+              
+                function findKey(meta) {
+                  var uniqueKey = 'id';
+                  Object.keys(meta.metadata.properties).forEach(function(prop) {
+                    if (meta.metadata.properties[prop].id) {
+                      uniqueKey = prop;
+                    }
+                  });
+                  return uniqueKey;
+                }
+                if(!this.idField || this.idField === 'id'){
+                  this.set('idField', findKey(meta));
                 }
                 this.set('defaultVM', meta.defaultVM);
 
