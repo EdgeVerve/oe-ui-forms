@@ -80,6 +80,7 @@
             self.refreshing = false;
           }
         });
+        this.fire('lazy-component-loaded');
       },
       _loadElement: function () {
         var self = this;

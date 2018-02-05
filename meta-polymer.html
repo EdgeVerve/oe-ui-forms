@@ -626,8 +626,9 @@
                 //node.setAttribute('columns', '[[fields.' + fieldId + '.columns]]');
                 node.setAttribute('model', fmeta.modeltype);
                 fieldId && node.setAttribute('items', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
-                node.setAttribute('editor-form-url', restApiRoot + '/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
-                    '-form.html');
+                var defaultFormUrl = restApiRoot + '/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
+                    '-form.html'
+                node.setAttribute('editor-form-url',fmeta['editor-form-url'] || defaultFormUrl);
                 node.setAttribute('record-handling', recordHandling);
             }
 
