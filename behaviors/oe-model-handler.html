@@ -166,7 +166,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           retUrl += '?';
           var params = this._queryStringAsObject();
 
-          Object.keys(params).forEach(function(criterion) {
+          params && Object.keys(params).forEach(function(criterion) {
             retUrl += 'filter[where][' + criterion + ']=' + params[criterion] + '&';
           });
 
@@ -184,7 +184,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
             }
           });
         }
-      
+
       }
       return retUrl;
     },
@@ -365,7 +365,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         function (err) {
           var ajaxMethod = isUpdate ? 'PUT' : 'POST';
           var ajaxUrl = self.getUrl(ajaxMethod, model);
-        
+
           if (!ajaxUrl) {
             self.fire('oe-show-error', 'rest url must be set before submit');
             return;

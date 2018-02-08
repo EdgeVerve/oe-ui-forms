@@ -240,10 +240,10 @@
                 meta.posturl && this.set('posturl', meta.posturl);
                 meta.puturl && this.set('puturl', meta.puturl);
                 meta.deleteurl && this.set('deleteurl', meta.deleteurl);
-              
+
                 function findKey(meta) {
                   var uniqueKey = 'id';
-                  Object.keys(meta.metadata.properties).forEach(function(prop) {
+                  meta.metadata.properties && Object.keys(meta.metadata.properties).forEach(function(prop) {
                     if (meta.metadata.properties[prop].id) {
                       uniqueKey = prop;
                     }
@@ -297,7 +297,7 @@
             var defaultVM = {};
             var model = models[modelName];
             if (model) {
-                Object.keys(model.properties).forEach(function(propName) {
+                model.properties && Object.keys(model.properties).forEach(function(propName) {
                     var propData = model.properties[propName];
                     if (propData.default !== undefined) {
                         defaultVM[propName] = propData.default;
@@ -344,7 +344,7 @@
             }
 
             var str = '<' + fmeta.uitype + ' ';
-            Object.keys(obj).forEach(function(key) {
+            obj && Object.keys(obj).forEach(function(key) {
                 var attrValue = obj[key];
                 if (typeof attrValue === 'object') {
                     str += key + "='" + JSON.stringify(attrValue) + "' ";
@@ -387,7 +387,7 @@
         function getPrimaryKey(uimeta) {
             var primaryKey = 'id';
             if (uimeta) {
-                Object.keys(uimeta.metadata.properties).forEach(function(prop) {
+                uimeta.metadata.properties && Object.keys(uimeta.metadata.properties).forEach(function(prop) {
                     if (uimeta.metadata.properties[prop].id) {
                         primaryKey = prop;
                     }
@@ -403,7 +403,7 @@
             var expressionAttributes = ['label', 'textContent', 'value', 'class', 'required', 'disabled', 'hidden',
                 'precision'
             ];
-            Object.keys(fmeta).forEach(function(attributeName) {
+            fmeta && Object.keys(fmeta).forEach(function(attributeName) {
 
                 if (!override && node.hasAttribute(attributeName)) {
                     return;
@@ -722,7 +722,7 @@
             uimeta.metadata = uimeta.metadata || {};
             var modelMeta = uimeta.metadata.properties || {};
             uimeta.dynamicDefaults = uimeta.dynamicDefaults || [];
-            Object.keys(modelMeta).forEach(function(fieldId) {
+            modelMeta && Object.keys(modelMeta).forEach(function(fieldId) {
                 var fmeta = modelMeta[fieldId] || {};
                 fmeta.label = fmeta.label || camelCaseToLabel(fieldId);
                 if(fmeta.type == 'model'){
@@ -1017,7 +1017,7 @@
                         var subModelMeta = uimeta.metadata.models[fmeta.modeltype];
                         subModelMeta = subModelMeta && subModelMeta.properties ? subModelMeta.properties : {};
 
-                        Object.keys(subModelMeta).forEach(function(subField) {
+                        subModelMeta && Object.keys(subModelMeta).forEach(function(subField) {
                             var subFieldMeta = findFieldMeta(subField, subModelMeta, uimeta);
                             subFieldMeta.label = subFieldMeta.label || camelCaseToLabel(subField);
 
@@ -1119,7 +1119,7 @@
         }
 
         function setAttributesOnElements(uimeta) {
-            Object.keys(uimeta.elements).forEach(function(fieldId) {
+            uimeta.elements && Object.keys(uimeta.elements).forEach(function(fieldId) {
                 var elementData = uimeta.elements[fieldId];
                 var controls = controlsByField[fieldId];
                 if (!controls) {
@@ -1190,16 +1190,16 @@
                     prototype.behaviors.push(OEUtils.deepValue(window, uimeta.polymerConfig.behaviors[i]));
                 }
 
-                Object.keys(uimeta.polymerConfig.functions).forEach(function(funcName) {
+                uimeta.polymerConfig.functions && Object.keys(uimeta.polymerConfig.functions).forEach(function(funcName) {
                     prototype[funcName] = OEUtils.createFunction(uimeta.polymerConfig.functions[funcName]);
                 });
 
-                Object.keys(uimeta.polymerConfig.properties).forEach(function(propName) {
+                uimeta.polymerConfig.properties && Object.keys(uimeta.polymerConfig.properties).forEach(function(propName) {
                     prototype.properties = prototype.properties || {};
                     prototype.properties[propName] = uimeta.polymerConfig.properties[propName];
                 });
 
-                Object.keys(uimeta.polymerConfig.listeners).forEach(function(eventName) {
+                uimeta.polymerConfig.listeners && Object.keys(uimeta.polymerConfig.listeners).forEach(function(eventName) {
                     prototype.listeners = prototype.listeners || {};
                     prototype.listeners[eventName] = uimeta.polymerConfig.listeners[eventName];
                 });
