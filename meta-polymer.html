@@ -1186,7 +1186,7 @@
             };
 
             if (uimeta.polymerConfig) {
-                for(var i = 0; i < uimeta.polymerConfig.behaviors.length; i++) {
+                uimeta.polymerConfig.behaviors && for(var i = 0; i < uimeta.polymerConfig.behaviors.length; i++) {
                     prototype.behaviors.push(OEUtils.deepValue(window, uimeta.polymerConfig.behaviors[i]));
                 }
 
