@@ -490,9 +490,9 @@
                         }
                     }
                 } else if (['uitype', 'type', 'refcodetype', 'enum', 'enumtype', 'evtype'].indexOf(attributeName) === -1) {
-                    if (attributeName === 'max' && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) === -1)) {
+                    if (attributeName === 'max' && fmeta.type && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) === -1)) {
                         attributeName = 'maxlength';
-                    } else if (attributeName === 'min' && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) ===
+                    } else if (attributeName === 'min' && fmeta.type && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) ===
                             -1)) {
                         attributeName = 'minlength';
                     }
@@ -552,7 +552,15 @@
                                     attributeValue = attributeValue.replace(new RegExp(v.raw, 'g'), v.variable);
                                 });
 
-                                prototype[funcName] = new Function(funcArgs, 'return (' + attributeValue + ');');
+                              //For Required attribute, 
+                              //if new required value is false, 
+                              //we also need to clear any previous errors.
+                              var funcLogic='var retVal=('+attributeValue+');';
+                              if(attributeName==='required'){
+                                funcLogic+='!retVal && this.clearFieldErrors && this.clearFieldErrors("'+fieldId+'","valueMissing");'; 
+                              }
+                              funcLogic += 'return retVal;'
+                              prototype[funcName] = new Function(funcArgs, funcLogic);
                             }
 
                             if (attributeName === 'value') {
@@ -1121,6 +1129,7 @@
         function setAttributesOnElements(uimeta) {
             uimeta.elements && Object.keys(uimeta.elements).forEach(function(fieldId) {
                 var elementData = uimeta.elements[fieldId];
+				elementData.fieldId = elementData.fieldId || fieldId;
                 var controls = controlsByField[fieldId];
                 if (!controls) {
                     var query = fieldId.startsWith('@') ? fieldId.substr(1, fieldId.length) : '' + fieldId;
@@ -1186,7 +1195,7 @@
             };
 
             if (uimeta.polymerConfig) {
-                uimeta.polymerConfig.behaviors && for(var i = 0; i < uimeta.polymerConfig.behaviors.length; i++) {
+                for(var i = 0; uimeta.polymerConfig.behaviors && i < uimeta.polymerConfig.behaviors.length; i++) {
                     prototype.behaviors.push(OEUtils.deepValue(window, uimeta.polymerConfig.behaviors[i]));
                 }
 
