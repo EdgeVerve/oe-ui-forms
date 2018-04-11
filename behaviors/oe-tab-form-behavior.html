@@ -1,0 +1,49 @@
+<script>
+  var OEUtils = OEUtils || {};
+  OEUtils.TabFormImpl = {
+    properties: {
+      selectedStep: {
+        type: Number,
+        value: 0
+      }
+    },
+    observers: [
+      '_computeSteps(meta.container.steps)'
+    ],
+    _goPrev: function () {
+      if (this.selectedStep > 0) {
+        this.set('selectedStep', this.selectedStep - 1);
+      }
+    },
+    _goNext: function () {
+      if (this.stepperSteps.length > (this.selectedStep + 1)) {
+        this.set('selectedStep', this.selectedStep + 1);
+      }
+    },
+    _computeBtnText: function (steps, curStep) {
+      return curStep === (steps.length - 1) ? "Save" : "Next";
+    },
+    _computeBtnIcon: function (steps, curStep) {
+      return curStep === (steps.length - 1) ? "save" : "chevron-right";
+    },
+    _computeSteps: function (steps, isVerticalLayout) {
+      var stepperSteps = steps.map(function (step) {
+        return {
+          "label": step.label,
+          "isDisabled": false,
+          "hasError": false,
+          "isCompleted": false
+        }
+      });
+      this.set('stepperSteps', stepperSteps);
+    }
+  }
+  OEUtils.TabFormBehavior = [
+    OEUtils.TabFormImpl,
+    OEUtils.AjaxBehavior,
+    OEUtils.FormValidationBehavior,
+    OEUtils.FormMessagesBehavior,
+    OEUtils.ModelHandler
+  ]
+
+</script>
