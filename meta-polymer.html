@@ -489,7 +489,7 @@
                             node.removeAttribute(attributeName);
                         }
                     }
-                } else if (['uitype', 'type', 'refcodetype', 'enum', 'enumtype', 'evtype'].indexOf(attributeName) === -1) {
+                } else if (['uitype', 'type', 'refcodetype', 'enum', 'enumtype', 'oetype'].indexOf(attributeName) === -1) {
                     if (attributeName === 'max' && fmeta.type && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) === -1)) {
                         attributeName = 'maxlength';
                     } else if (attributeName === 'min' && fmeta.type && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) ===
@@ -701,7 +701,12 @@
                         fmeta.displayproperty = 'description';
                         fmeta.valueproperty = 'code';
                         if (uimeta.metadata.models[fmeta.enumtype || fmeta.refcodetype]) {
-                            fmeta.listurl = uimeta.metadata.models[fmeta.enumtype || fmeta.refcodetype].resturl;
+
+                            /*Check if listurl property is provided in fields array
+                            * In case the referenced model has additional property along with Base refcode properties
+                            * They can provide the url with specific filter.
+                            */
+                            fmeta.listurl = fmeta.listurl || uimeta.metadata.models[fmeta.enumtype || fmeta.refcodetype].resturl;
                         }
                     } else if (fmeta.in) {
                         fmeta.type = 'combo';
@@ -916,6 +921,29 @@
             var excludeFields = uimeta.excludeFields || [];
             if (!Array.isArray(excludeFields)) {
                 excludeFields = [];
+            }
+
+            //Create containers dynamically based on UIComponent property container
+            if(uimeta.container){
+                var containerSteps = uimeta.container.steps;
+                if(containerSteps && Array.isArray(containerSteps)){
+                    containerSteps.forEach(function(step){
+                        var targetQuery = step.target || uimeta.container.target;
+                        var targetEle = templateCont.deepQuery(targetQuery);
+                        if(!targetEle){
+                            return;
+                        }
+                        var nodeAttributes = step.nodeAttributes || uimeta.container.nodeAttributes;
+                        var contEl = createNodeForElement(step.nodeType || uimeta.container.nodeType);
+                        contEl.setAttribute('id',step.id);
+                        if(nodeAttributes){
+                            Object.keys(nodeAttributes).forEach(function(attrKey){
+                                contEl.setAttribute(attrKey,nodeAttributes[attrKey])
+                            });
+                        }
+                        targetEle.appendChild(contEl);
+                    })
+                }
             }
 
             if (uimeta.fields && Array.isArray(uimeta.fields)) {
@@ -1198,7 +1226,7 @@
                 for(var i = 0; uimeta.polymerConfig.behaviors && i < uimeta.polymerConfig.behaviors.length; i++) {
                     prototype.behaviors.push(OEUtils.deepValue(window, uimeta.polymerConfig.behaviors[i]));
                 }
-
+               
                 uimeta.polymerConfig.functions && Object.keys(uimeta.polymerConfig.functions).forEach(function(funcName) {
                     prototype[funcName] = OEUtils.createFunction(uimeta.polymerConfig.functions[funcName]);
                 });
