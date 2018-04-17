@@ -128,6 +128,7 @@ Once the form is submitted using modelHandler behavior's doSave or doSubmit the 
             this.resolveError(err);
           } else {
             this.fire('oe-draft-deleted');
+            delete this.draftInstance;
           }
         }.bind(this));
       }

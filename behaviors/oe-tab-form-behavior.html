@@ -22,6 +22,14 @@ This behavior comes with functions to traverse the steps in a multi-paged form.
     observers: [
       '_computeSteps(meta.container.steps)'
     ],
+    listeners:{
+      'oe-formdata-inserted':'_gotoFirstPage',
+      'oe-formdata-deleted':'_gotoFirstPage',
+      'oe-formdata-updated':'_gotoFirstPage'
+    },
+    _gotoFirstPage:function(){
+      this.set('selectedStep', 0);
+    },
     _goPrev: function () {
       if (this.selectedStep > 0) {
         this.set('selectedStep', this.selectedStep - 1);
@@ -48,6 +56,7 @@ This behavior comes with functions to traverse the steps in a multi-paged form.
         }
       });
       this.set('stepperSteps', stepperSteps);
+      this._gotoFirstPage();
     }
   }
   OEUtils.TabFormBehavior = [
