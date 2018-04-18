@@ -241,6 +241,12 @@
                 meta.puturl && this.set('puturl', meta.puturl);
                 meta.deleteurl && this.set('deleteurl', meta.deleteurl);
 
+                if(meta.componentData){
+                    Object.keys(meta.componentData).forEach(function(key){
+                        this.set(key,meta.componentData[key]);
+                    }.bind(this));
+                }
+
                 function findKey(meta) {
                   var uniqueKey = 'id';
                   meta.metadata.properties && Object.keys(meta.metadata.properties).forEach(function(prop) {
