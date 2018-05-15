@@ -114,13 +114,12 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       disableAutoFetch: {
         type: 'boolean'
       },
-      /* When set to true, resturl is used as it is without appending :modelId*/
-      urlIsSingular: {
-        type: 'boolean'
-      },
       model: {
-        type: 'object',
-        observer: '_modelChange'
+        type: 'object'
+      },
+      idField:{
+        type: String,
+        value: 'id'
       },
       _middlewares: {
         type: Object
@@ -129,9 +128,6 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
     datakeyChanged: function () {
       console.warn('datakey is depricated and will be removed in future release. Use modelId property instead.');
       this.set('modelId', this.datakey);
-    },
-    _modelChange: function () {
-
     },
     _queryStringAsObject: function () {
       var result = {};
@@ -156,8 +152,13 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       return (result);
     },
     _getURLForFetch: function () {
-      var retUrl = this.resturl;
-      if(!this.urlIsSingular){
+      var retUrl;
+      if (this.geturl) {
+        var model = {};
+        model[this.idField]=this.modelId;
+        retUrl = this._concreteUrl(this.geturl, model);
+      } else {
+        retUrl = this.resturl;
         if (this.modelId) {
           retUrl += '/' + this.modelId;
         } else {
@@ -165,9 +166,9 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           retUrl += '?';
           var params = this._queryStringAsObject();
 
-          for (var criterion in params) {
+          params && Object.keys(params).forEach(function(criterion) {
             retUrl += 'filter[where][' + criterion + ']=' + params[criterion] + '&';
-          }
+          });
 
           //remove ending & or ?
           retUrl = retUrl.substr(0, retUrl.length - 1);
@@ -183,11 +184,11 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
             }
           });
         }
-      }
 
+      }
       return retUrl;
     },
-    _doFetch: function (evt) { // eslint-disable-line no-unused-vars
+    _doFetch: function () { //eslint-disable-line no-unused-vars
       var self = this;
       var ajaxCall = document.createElement('oe-ajax');
       ajaxCall.contentType = 'application/json';
@@ -205,21 +206,21 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
     },
     doFetch: function (evt) {
       /*do not use evt as doFetch is used as observer also*/
-      if (!this.disableAutoFetch && this.resturl && (this.urlIsSingular || this.querystring || this.modelId)) {
-        this._doFetch(evt);
+      if (!this.disableAutoFetch && this.resturl && (this.querystring || this.modelId)) {
+        this._doFetch();
       }
     },
     modelIdChanged: function (evt) { // eslint-disable-line no-unused-vars
       evt = null;
       if (!this.disableAutoFetch && this.resturl && this.modelId) {
         if (this.modelId !== 'new' && this.modelId !== -1) {
-          this._doFetch(this.modelId);
+          this._doFetch();
         }
       }
     },
     fetchList: function (callback) {
       /* Must not call fetchList when url-is-singular */
-      if (!this.urlIsSingular && this.resturl) {
+      if (this.resturl) {
         var ajaxCall = document.createElement('oe-ajax');
         ajaxCall.contentType = 'application/json';
         ajaxCall.handleAs = 'json';
@@ -301,6 +302,50 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         delete this[modelName]._version;
       }
     },
+    _concreteUrl: function(url, model){
+      if(url){
+        url = url.replace(':version', model._version);
+        url = url.replace(':id', model[this.idField]);
+      }
+      return url;
+    },
+    getUrl: function(method, model){
+      switch(method){
+          case 'GET':
+          case 'get':
+          {
+            this._getURLForFetch();
+            break;
+          }
+          case 'POST':
+          case 'post':
+          {
+            return this.posturl?this._concreteUrl(this.posturl, model):this.resturl;
+            break;
+          }
+          case 'PUT':
+          case 'put':
+          {
+            return this.puturl?this._concreteUrl(this.puturl, model):this.resturl;
+            break;
+          }
+          case 'DELETE':
+          case 'delete':
+          {
+            if(this.deleteurl){
+              return this._concreteUrl(this.deleteurl, model)
+            } else {
+              var returl = this.resturl + '/' + model[this.idField];
+              // If version is applicable, then do a delete on the right endpoint
+              if (model._version) {
+                returl = returl + '/' + model._version;
+              }
+              return returl;
+            }
+            break;
+          }
+      }
+    },
     doSubmit: function (evt) {
       var self = this;
       var button = evt ? evt.currentTarget : undefined;
@@ -309,22 +354,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       var model = self[modelName];
       var isUpdate = false;
 
-      function findKey() {
-        var uniqueKey = 'id';
-        if (self.meta) {
-          for (var prop in self.meta.metadata.properties) {
-            if (self.meta.metadata.properties[prop].id) {
-              uniqueKey = prop;
-            }
-          }
-          return uniqueKey;
-        }
-        return uniqueKey;
-      }
-
-      var uniqueKey = model.id ? 'id' : findKey();
-
-      if (model[uniqueKey]) {
+      if (model[self.idField]) {
         isUpdate = true;
         model._newVersion = OEUtils.UUID.generate();
       }
@@ -333,8 +363,10 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       self._executeMiddlewares((isUpdate ? self._middlewares.preUpdate : self._middlewares.preInsert), headers,
         model,
         function (err) {
+          var ajaxMethod = isUpdate ? 'PUT' : 'POST';
+          var ajaxUrl = self.getUrl(ajaxMethod, model);
 
-          if (!self.resturl) {
+          if (!ajaxUrl) {
             self.fire('oe-show-error', 'rest url must be set before submit');
             return;
           }
@@ -342,7 +374,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
             var ajaxCall = document.createElement('oe-ajax');
             ajaxCall.contentType = 'application/json';
             ajaxCall.handleAs = 'json';
-            ajaxCall.url = self.resturl;
+            ajaxCall.url = ajaxUrl;
 
             ajaxCall.method = isUpdate ? 'PUT' : 'POST';
 
@@ -378,22 +410,14 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       var button = evt.currentTarget;
       var modelName = button.getAttribute('oe-action-model') || self.modelAlias;
       var model = self[modelName];
-      if (model && model.id) {
+      if (model && model[self.idField]) {
         var headers = {};
         self._executeMiddlewares(self._middlewares.preDelete, headers, model, function (err) {
           if (!err) {
             var ajaxCall = document.createElement('oe-ajax');
             ajaxCall.contentType = 'application/json';
             ajaxCall.handleAs = 'json';
-            if(self.urlIsSingular){
-              ajaxCall.url = self.resturl;
-            } else {
-              ajaxCall.url = self.resturl + '/' + model.id;
-              // If version is applicable, then do a delete on the right endpoint
-              if (model._version) {
-                ajaxCall.url = ajaxCall.url + '/' + model._version;
-              }              
-            }
+            ajaxCall.url = self.getUrl('DELETE', model);
             ajaxCall.method = 'DELETE';
             ajaxCall.body = model;
 

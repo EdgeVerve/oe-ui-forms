@@ -133,7 +133,7 @@
           var value = this._deepValue(this.model,this.fields[0]);
           valid = (this.combinations.indexOf(value) >= 0);
         } else {
-          for (var idx in this.fields) {
+          for (var idx = 0; idx < this.fields.length; idx++) {
             var field = this.fields[idx];
             value = this._deepValue(this.model,field);
             refObject[field] = value;
@@ -141,7 +141,7 @@
 
 
           valid = false;
-          for (idx in this.combinations) {
+          for (var idx = 0; idx < this.combinations.length; idx++) {
             if (this.isEquivalent(refObject, this.combinations[idx])) {
               valid = true;
               break;

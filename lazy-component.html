@@ -80,6 +80,7 @@
             self.refreshing = false;
           }
         });
+        this.fire('lazy-component-loaded');
       },
       _loadElement: function () {
         var self = this;
@@ -130,6 +131,7 @@
         var form = this.element;
         var model = (form.defaultVM ? JSON.parse(JSON.stringify(form.defaultVM)) : {});
         model = Object.assign(model, overrideObj);
+        model = JSON.parse(JSON.stringify(model));
         this.set('model', model);
       }
     });

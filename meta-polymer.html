@@ -233,12 +233,31 @@
                 this.set('meta', meta);
                 this.set('modelAlias', meta.modelAlias);
                 meta.metadata = meta.metadata || {};
-                var resturl = meta.resturl || meta.metadata.resturl;
-                if (resturl) {
-                    var urlIsSingular = (resturl.charAt(resturl.length - 1) === '$');
-                    resturl = urlIsSingular ? resturl.substr(0, resturl.length - 1) : resturl;
-                    this.set('urlIsSingular', urlIsSingular);
-                    this.set('resturl', resturl);
+                if(!this.resturl){
+                  this.set('resturl', meta.resturl || meta.metadata.resturl);
+                }
+                meta.geturl && this.set('geturl', meta.geturl);
+                meta.posturl && this.set('posturl', meta.posturl);
+                meta.puturl && this.set('puturl', meta.puturl);
+                meta.deleteurl && this.set('deleteurl', meta.deleteurl);
+
+                if(meta.componentData){
+                    Object.keys(meta.componentData).forEach(function(key){
+                        this.set(key,meta.componentData[key]);
+                    }.bind(this));
+                }
+
+                function findKey(meta) {
+                  var uniqueKey = 'id';
+                  meta.metadata.properties && Object.keys(meta.metadata.properties).forEach(function(prop) {
+                    if (meta.metadata.properties[prop].id) {
+                      uniqueKey = prop;
+                    }
+                  });
+                  return uniqueKey;
+                }
+                if(!this.idField || this.idField === 'id'){
+                  this.set('idField', findKey(meta));
                 }
                 this.set('defaultVM', meta.defaultVM);
 
@@ -284,7 +303,7 @@
             var defaultVM = {};
             var model = models[modelName];
             if (model) {
-                for (var propName in model.properties) {
+                model.properties && Object.keys(model.properties).forEach(function(propName) {
                     var propData = model.properties[propName];
                     if (propData.default !== undefined) {
                         defaultVM[propName] = propData.default;
@@ -294,7 +313,7 @@
                     } else if (propData.type === 'model') {
                         defaultVM[propName] = _getModelDefaultVM(propData.modeltype, models);
                     }
-                }
+                });
             }
             return defaultVM;
         }
@@ -331,7 +350,7 @@
             }
 
             var str = '<' + fmeta.uitype + ' ';
-            Object.keys(obj).forEach(function(key) {
+            obj && Object.keys(obj).forEach(function(key) {
                 var attrValue = obj[key];
                 if (typeof attrValue === 'object') {
                     str += key + "='" + JSON.stringify(attrValue) + "' ";
@@ -374,11 +393,11 @@
         function getPrimaryKey(uimeta) {
             var primaryKey = 'id';
             if (uimeta) {
-                for (var prop in uimeta.metadata.properties) {
+                uimeta.metadata.properties && Object.keys(uimeta.metadata.properties).forEach(function(prop) {
                     if (uimeta.metadata.properties[prop].id) {
                         primaryKey = prop;
                     }
-                }
+                });
                 return primaryKey;
             }
             return primaryKey;
@@ -390,7 +409,7 @@
             var expressionAttributes = ['label', 'textContent', 'value', 'class', 'required', 'disabled', 'hidden',
                 'precision'
             ];
-            Object.keys(fmeta).forEach(function(attributeName) {
+            fmeta && Object.keys(fmeta).forEach(function(attributeName) {
 
                 if (!override && node.hasAttribute(attributeName)) {
                     return;
@@ -476,10 +495,10 @@
                             node.removeAttribute(attributeName);
                         }
                     }
-                } else if (['uitype', 'type', 'refcodetype', 'enum', 'enumtype', 'evtype'].indexOf(attributeName) === -1) {
-                    if (attributeName === 'max' && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) === -1)) {
+                } else if (['uitype', 'type', 'refcodetype', 'enum', 'enumtype', 'oetype'].indexOf(attributeName) === -1) {
+                    if (attributeName === 'max' && fmeta.type && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) === -1)) {
                         attributeName = 'maxlength';
-                    } else if (attributeName === 'min' && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) ===
+                    } else if (attributeName === 'min' && fmeta.type && (['number', 'decimal', 'integer', 'date'].indexOf(fmeta.type) ===
                             -1)) {
                         attributeName = 'minlength';
                     }
@@ -539,7 +558,15 @@
                                     attributeValue = attributeValue.replace(new RegExp(v.raw, 'g'), v.variable);
                                 });
 
-                                prototype[funcName] = new Function(funcArgs, 'return (' + attributeValue + ');');
+                              //For Required attribute, 
+                              //if new required value is false, 
+                              //we also need to clear any previous errors.
+                              var funcLogic='var retVal=('+attributeValue+');';
+                              if(attributeName==='required'){
+                                funcLogic+='!retVal && this.clearFieldErrors && this.clearFieldErrors("'+fieldId+'","valueMissing");'; 
+                              }
+                              funcLogic += 'return retVal;'
+                              prototype[funcName] = new Function(funcArgs, funcLogic);
                             }
 
                             if (attributeName === 'value') {
@@ -613,8 +640,9 @@
                 //node.setAttribute('columns', '[[fields.' + fieldId + '.columns]]');
                 node.setAttribute('model', fmeta.modeltype);
                 fieldId && node.setAttribute('items', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
-                node.setAttribute('editor-form-url', restApiRoot + '/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
-                    '-form.html');
+                var defaultFormUrl = restApiRoot + '/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
+                    '-form.html'
+                node.setAttribute('editor-form-url',fmeta['editor-form-url'] || defaultFormUrl);
                 node.setAttribute('record-handling', recordHandling);
             }
 
@@ -679,7 +707,12 @@
                         fmeta.displayproperty = 'description';
                         fmeta.valueproperty = 'code';
                         if (uimeta.metadata.models[fmeta.enumtype || fmeta.refcodetype]) {
-                            fmeta.listurl = uimeta.metadata.models[fmeta.enumtype || fmeta.refcodetype].resturl;
+
+                            /*Check if listurl property is provided in fields array
+                            * In case the referenced model has additional property along with Base refcode properties
+                            * They can provide the url with specific filter.
+                            */
+                            fmeta.listurl = fmeta.listurl || uimeta.metadata.models[fmeta.enumtype || fmeta.refcodetype].resturl;
                         }
                     } else if (fmeta.in) {
                         fmeta.type = 'combo';
@@ -708,10 +741,14 @@
             uimeta.metadata = uimeta.metadata || {};
             var modelMeta = uimeta.metadata.properties || {};
             uimeta.dynamicDefaults = uimeta.dynamicDefaults || [];
-            Object.keys(modelMeta).forEach(function(fieldId) {
+            modelMeta && Object.keys(modelMeta).forEach(function(fieldId) {
                 var fmeta = modelMeta[fieldId] || {};
                 fmeta.label = fmeta.label || camelCaseToLabel(fieldId);
-                OEUtils.setDeepValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
+                if(fmeta.type == 'model'){
+                    OEUtils.setDeepValue(defaultVM, fieldId, _getModelDefaultVM(fmeta.modeltype, uimeta.metadata.models));
+                }else{
+                    OEUtils.setDeepValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
+                }
             });
 
             // field id in elements can be string -> fieldid
@@ -892,6 +929,29 @@
                 excludeFields = [];
             }
 
+            //Create containers dynamically based on UIComponent property container
+            if(uimeta.container){
+                var containerSteps = uimeta.container.steps;
+                if(containerSteps && Array.isArray(containerSteps)){
+                    containerSteps.forEach(function(step){
+                        var targetQuery = step.target || uimeta.container.target;
+                        var targetEle = templateCont.deepQuery(targetQuery);
+                        if(!targetEle){
+                            return;
+                        }
+                        var nodeAttributes = step.nodeAttributes || uimeta.container.nodeAttributes;
+                        var contEl = createNodeForElement(step.nodeType || uimeta.container.nodeType);
+                        contEl.setAttribute('id',step.id);
+                        if(nodeAttributes){
+                            Object.keys(nodeAttributes).forEach(function(attrKey){
+                                contEl.setAttribute(attrKey,nodeAttributes[attrKey])
+                            });
+                        }
+                        targetEle.appendChild(contEl);
+                    })
+                }
+            }
+
             if (uimeta.fields && Array.isArray(uimeta.fields)) {
                 uimeta.fields.forEach(function(fmeta) {
 
@@ -999,7 +1059,7 @@
                         var subModelMeta = uimeta.metadata.models[fmeta.modeltype];
                         subModelMeta = subModelMeta && subModelMeta.properties ? subModelMeta.properties : {};
 
-                        for (var subField in subModelMeta) {
+                        subModelMeta && Object.keys(subModelMeta).forEach(function(subField) {
                             var subFieldMeta = findFieldMeta(subField, subModelMeta, uimeta);
                             subFieldMeta.label = subFieldMeta.label || camelCaseToLabel(subField);
 
@@ -1039,7 +1099,7 @@
                                     });
                                 }
                             }
-                        }
+                        });
                     } else {
                         var node = createNodeForMetaDefn(fmeta);
                         if (node) {
@@ -1073,7 +1133,7 @@
 
             var oeValidations = uimeta.oeValidations || [];
             //append validations
-            for (i in oeValidations) {
+            for(i = 0; i < oeValidations.length; i++) {
                 var validation = oeValidations[i];
 
                 var validationElement = createNodeForElement(validation.type);
@@ -1101,8 +1161,9 @@
         }
 
         function setAttributesOnElements(uimeta) {
-            Object.keys(uimeta.elements).forEach(function(fieldId) {
+            uimeta.elements && Object.keys(uimeta.elements).forEach(function(fieldId) {
                 var elementData = uimeta.elements[fieldId];
+				elementData.fieldId = elementData.fieldId || fieldId;
                 var controls = controlsByField[fieldId];
                 if (!controls) {
                     var query = fieldId.startsWith('@') ? fieldId.substr(1, fieldId.length) : '' + fieldId;
@@ -1138,7 +1199,7 @@
             prototype.behaviors = prototype.behaviors || [];
             prototype.behaviors.push(OEUtils.MetaBehavior);
             prototype.behaviors.push(OEUtils.UtilsBehavior);
-            // Incase form valodation behaviors are defined in the metapolymer add '_clearAllErrors' 
+            // Incase form valodation behaviors are defined in the metapolymer add '_clearAllErrors'
             if (prototype.behaviors.indexOf(OEUtils.FormValidationBehavior) >= 0) {
                 prototype.observers = prototype.observers || [];
                 prototype.observers.push('_clearAllErrors(' + uimeta.modelAlias + ')');
@@ -1168,22 +1229,23 @@
             };
 
             if (uimeta.polymerConfig) {
-                for (var i in uimeta.polymerConfig.behaviors) {
+                for(var i = 0; uimeta.polymerConfig.behaviors && i < uimeta.polymerConfig.behaviors.length; i++) {
                     prototype.behaviors.push(OEUtils.deepValue(window, uimeta.polymerConfig.behaviors[i]));
                 }
-
-                for (var funcName in uimeta.polymerConfig.functions) {
+               
+                uimeta.polymerConfig.functions && Object.keys(uimeta.polymerConfig.functions).forEach(function(funcName) {
                     prototype[funcName] = OEUtils.createFunction(uimeta.polymerConfig.functions[funcName]);
-                }
+                });
 
-                for (var propName in uimeta.polymerConfig.properties) {
+                uimeta.polymerConfig.properties && Object.keys(uimeta.polymerConfig.properties).forEach(function(propName) {
                     prototype.properties = prototype.properties || {};
                     prototype.properties[propName] = uimeta.polymerConfig.properties[propName];
-                }
-                for (var eventName in uimeta.polymerConfig.listeners) {
+                });
+
+                uimeta.polymerConfig.listeners && Object.keys(uimeta.polymerConfig.listeners).forEach(function(eventName) {
                     prototype.listeners = prototype.listeners || {};
                     prototype.listeners[eventName] = uimeta.polymerConfig.listeners[eventName];
-                }
+                });
             }
 
             Polymer(prototype);
