@@ -723,6 +723,7 @@
                         modelMeta[fieldId] = fmeta;
                     }
 
+                    fmeta.label = fmeta.label || camelCaseToLabel(fieldId);
                     if (fmeta.enumtype || fmeta.refcodetype) {
                         fmeta.type = 'combo';
                         fmeta.displayproperty = 'description';
@@ -762,6 +763,7 @@
             uimeta.metadata = uimeta.metadata || {};
             var modelMeta = uimeta.metadata.properties || {};
             uimeta.dynamicDefaults = uimeta.dynamicDefaults || [];
+             if(uimeta.autoInjectFields){
             modelMeta && Object.keys(modelMeta).forEach(function(fieldId) {
                 var fmeta = modelMeta[fieldId] || {};
                 fmeta.label = fmeta.label || camelCaseToLabel(fieldId);
@@ -771,6 +773,7 @@
                     OEUtils.setDeepValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
                 }
             });
+             }
 
             // field id in elements can be string -> fieldid
             // @something, something css selector
