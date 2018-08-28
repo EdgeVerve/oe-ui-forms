@@ -131,7 +131,11 @@
 
         if (this.fields.length == 1) {
           var value = this._deepValue(this.model,this.fields[0]);
-          valid = (this.combinations.indexOf(value) >= 0);
+          if (value) {
+            valid = (this.combinations.indexOf(value) >= 0);
+          } else {
+            valid = true;
+          }
         } else {
           for (var idx = 0; idx < this.fields.length; idx++) {
             var field = this.fields[idx];
