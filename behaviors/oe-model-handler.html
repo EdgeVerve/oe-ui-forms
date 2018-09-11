@@ -32,7 +32,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
   var OEUtils = OEUtils || {};
 
   OEUtils.ModelHandler = {
-    ready: function () {
+    ready: function() {
       this._middlewares = {
         preInsert: [],
         postInsert: [],
@@ -42,10 +42,10 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         postDelete: []
       };
     },
-    use: function (when, fn) {
+    use: function(when, fn) {
       this._middlewares[when].push(fn);
     },
-    _executeMiddlewares: function (middlewares) {
+    _executeMiddlewares: function(middlewares) {
       var n = -1;
 
       function executor(err) {
@@ -73,7 +73,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       if (args.length > 0) {
         callback = args[args.length - 1];
         //the last argument is our callback.
-        if (callback && typeof (callback) === 'function') {
+        if (callback && typeof(callback) === 'function') {
           args.pop();
         } else {
           callback = undefined;
@@ -117,7 +117,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       model: {
         type: 'object'
       },
-      idField:{
+      idField: {
         type: String,
         value: 'id'
       },
@@ -125,15 +125,15 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         type: Object
       }
     },
-    datakeyChanged: function () {
+    datakeyChanged: function() {
       console.warn('datakey is depricated and will be removed in future release. Use modelId property instead.');
       this.set('modelId', this.datakey);
     },
-    _queryStringAsObject: function () {
+    _queryStringAsObject: function() {
       var result = {};
       if (this.querystring) {
         var pairs = this.querystring.split('&');
-        pairs.forEach(function (pair) {
+        pairs.forEach(function(pair) {
           pair = pair.split('=');
           var name = pair[0];
           var value = pair[1];
@@ -151,11 +151,11 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       }
       return (result);
     },
-    _getURLForFetch: function () {
+    _getURLForFetch: function() {
       var retUrl;
       if (this.geturl) {
         var model = {};
-        model[this.idField]=this.modelId;
+        model[this.idField] = this.modelId;
         retUrl = this._concreteUrl(this.geturl, model);
       } else {
         retUrl = this.resturl;
@@ -177,7 +177,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         if (this.includes && this.includes.length > 0) {
           var includeFilters = this.includes.split(',');
           retUrl += '?';
-          includeFilters.forEach(function (filter, index) {
+          includeFilters.forEach(function(filter, index) {
             retUrl += 'filter[include]=' + filter;
             if ((index + 1) !== includeFilters.length) {
               retUrl += '&';
@@ -188,29 +188,29 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       }
       return retUrl;
     },
-    _doFetch: function () { //eslint-disable-line no-unused-vars
+    _doFetch: function() { //eslint-disable-line no-unused-vars
       var self = this;
       var ajaxCall = document.createElement('oe-ajax');
       ajaxCall.contentType = 'application/json';
       ajaxCall.handleAs = 'json';
       ajaxCall.url = this._getURLForFetch();
       ajaxCall.method = 'GET';
-      ajaxCall.addEventListener('response', function (event) {
+      ajaxCall.addEventListener('response', function(event) {
         self.set(self.modelAlias, event.detail.response);
         self.fire('oe-formdata-loaded', event.detail.response);
       });
-      ajaxCall.addEventListener('error', function (err) {
+      ajaxCall.addEventListener('error', function(err) {
         self.fire('oe-show-error', OEUtils.extractErrorMessage(err));
       });
       ajaxCall.generateRequest();
     },
-    doFetch: function (evt) {
+    doFetch: function(evt) {
       /*do not use evt as doFetch is used as observer also*/
       if (!this.disableAutoFetch && this.resturl && (this.querystring || this.modelId)) {
         this._doFetch();
       }
     },
-    modelIdChanged: function (evt) { // eslint-disable-line no-unused-vars
+    modelIdChanged: function(evt) { // eslint-disable-line no-unused-vars
       evt = null;
       if (!this.disableAutoFetch && this.resturl && this.modelId) {
         if (this.modelId !== 'new' && this.modelId !== -1) {
@@ -218,7 +218,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         }
       }
     },
-    fetchList: function (callback) {
+    fetchList: function(callback) {
       /* Must not call fetchList when url-is-singular */
       if (this.resturl) {
         var ajaxCall = document.createElement('oe-ajax');
@@ -226,10 +226,10 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         ajaxCall.handleAs = 'json';
         ajaxCall.url = this.resturl;
         ajaxCall.method = 'GET';
-        ajaxCall.addEventListener('response', function (evt) {
+        ajaxCall.addEventListener('response', function(evt) {
           callback(evt.detail.response);
         });
-        ajaxCall.addEventListener('error', function (evt) { // eslint-disable-line no-unused-vars
+        ajaxCall.addEventListener('error', function(evt) { // eslint-disable-line no-unused-vars
           callback(undefined);
         });
 
@@ -238,7 +238,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
     },
 
     /*Fires specified event passing data-event-details attribute value as details*/
-    doEvent: function (evt) {
+    doEvent: function(evt) {
       var btn = evt.currentTarget;
       var eventName = btn.getAttribute('oe-action-event');
       if (eventName) {
@@ -247,10 +247,10 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         console.warn('Event name not specified under [oe-action-event] attribute');
       }
     },
-    doValidate: function (evt) {
+    doValidate: function(evt) {
       var self = this;
       var button = evt.currentTarget;
-      self.validateForm().then(function (status) {
+      self.validateForm().then(function(status) {
         if (status.valid) {
           // for some strange reason, after introducing "validateForm().then" promise, evt looses currentTarget;
           //var button = evt.currentTarget;
@@ -265,10 +265,10 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         }
       });
     },
-    doSave: function (evt) {
+    doSave: function(evt) {
       var self = this;
-      var button = evt?evt.currentTarget:undefined;
-      self.validateForm().then(function (status) {
+      var button = evt ? evt.currentTarget : undefined;
+      self.validateForm().then(function(status) {
         if (status.valid) {
           if (self.emitOnSave) {
             var modelName = (button && button.getAttribute('oe-action-model')) || self.modelAlias;
@@ -286,13 +286,13 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         }
       });
     },
-    doClear: function (evt) {
+    doClear: function(evt) {
       var button = evt ? evt.currentTarget : undefined;
       var modelName = button ? (button.getAttribute('oe-action-model') || this.modelAlias) : this.modelAlias;
       this.fire('oe-reset-errors');
       this.set(modelName, this.defaultVM ? JSON.parse(JSON.stringify(this.defaultVM)) : {});
     },
-    doCopy: function (evt) {
+    doCopy: function(evt) {
       var button = evt ? evt.currentTarget : undefined;
       var modelName = button ? (button.getAttribute('oe-action-model') || this.modelAlias) : this.modelAlias;
       if (this[modelName]) {
@@ -302,37 +302,37 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         delete this[modelName]._version;
       }
     },
-    _concreteUrl: function(url, model){
-      if(url){
+    _concreteUrl: function(url, model) {
+      if (url) {
         url = url.replace(':version', model._version);
         url = url.replace(':id', model[this.idField]);
       }
       return url;
     },
-    getUrl: function(method, model){
-      switch(method){
-          case 'GET':
-          case 'get':
+    getUrl: function(method, model) {
+      switch (method) {
+        case 'GET':
+        case 'get':
           {
             this._getURLForFetch();
             break;
           }
-          case 'POST':
-          case 'post':
+        case 'POST':
+        case 'post':
           {
-            return this.posturl?this._concreteUrl(this.posturl, model):this.resturl;
+            return this.posturl ? this._concreteUrl(this.posturl, model) : this.resturl;
             break;
           }
-          case 'PUT':
-          case 'put':
+        case 'PUT':
+        case 'put':
           {
-            return this.puturl?this._concreteUrl(this.puturl, model):this.resturl;
+            return this.puturl ? this._concreteUrl(this.puturl, model) : this.resturl;
             break;
           }
-          case 'DELETE':
-          case 'delete':
+        case 'DELETE':
+        case 'delete':
           {
-            if(this.deleteurl){
+            if (this.deleteurl) {
               return this._concreteUrl(this.deleteurl, model)
             } else {
               var returl = this.resturl + '/' + model[this.idField];
@@ -346,7 +346,26 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           }
       }
     },
-    doSubmit: function (evt) {
+    setNullFields: function(model) {
+      if (typeof model !== 'object' || typeof model.getMonth === 'function') {
+        return;
+      }
+      
+      var self = this;
+      Object.keys(model).forEach(function(key) {
+        var value = model[key];
+        if (typeof value === 'undefined') {
+          model[key] = null;
+        } else if (Array.isArray(value)) {
+          value.forEach(function(item) {
+            self.setNullFields(item);
+          });
+        } else if (value && typeof value === 'object' && typeof value.getMonth !== 'function') {
+          self.setNullFields(value);
+        }
+      });
+    },
+    doSubmit: function(evt) {
       var self = this;
       var button = evt ? evt.currentTarget : undefined;
       var modelName = button ? (button.getAttribute('oe-action-model') || this.modelAlias) : this.modelAlias;
@@ -357,12 +376,15 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       if (model[self.idField]) {
         isUpdate = true;
         model._newVersion = OEUtils.UUID.generate();
+
+        /*Update undefined values with null*/
+        self.setNullFields(model);
       }
 
       var headers = {};
       self._executeMiddlewares((isUpdate ? self._middlewares.preUpdate : self._middlewares.preInsert), headers,
         model,
-        function (err) {
+        function(err) {
           var ajaxMethod = isUpdate ? 'PUT' : 'POST';
           var ajaxUrl = self.getUrl(ajaxMethod, model);
 
@@ -382,11 +404,11 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
             Object.assign(ajaxCall.headers, headers);
 
             ajaxCall.body = model;
-            ajaxCall.addEventListener('response', function (event) {
+            ajaxCall.addEventListener('response', function(event) {
               var response = event.detail ? event.detail.response : undefined;
               self._executeMiddlewares((isUpdate ? self._middlewares.postUpdate : self._middlewares.postInsert),
                 response, (isUpdate ? model : undefined),
-                function (err, response, old) { // eslint-disable-line no-unused-vars
+                function(err, response, old) { // eslint-disable-line no-unused-vars
                   if (!err) {
                     var oldData = model;
                     self.set(modelName, response);
@@ -397,7 +419,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
                   }
                 });
             });
-            ajaxCall.addEventListener('error', function (err) {
+            ajaxCall.addEventListener('error', function(err) {
               self.fire('oe-show-error', OEUtils.extractErrorMessage(err));
             });
 
@@ -405,14 +427,14 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           }
         });
     },
-    doDelete: function (evt) {
+    doDelete: function(evt) {
       var self = this;
       var button = evt.currentTarget;
       var modelName = button.getAttribute('oe-action-model') || self.modelAlias;
       var model = self[modelName];
       if (model && model[self.idField]) {
         var headers = {};
-        self._executeMiddlewares(self._middlewares.preDelete, headers, model, function (err) {
+        self._executeMiddlewares(self._middlewares.preDelete, headers, model, function(err) {
           if (!err) {
             var ajaxCall = document.createElement('oe-ajax');
             ajaxCall.contentType = 'application/json';
@@ -424,8 +446,8 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
             ajaxCall.headers = ajaxCall.headers || {};
             Object.assign(ajaxCall.headers, headers);
 
-            ajaxCall.addEventListener('response', function (evt) { // eslint-disable-line no-unused-vars
-              self._executeMiddlewares(self._middlewares.postDelete, model, function (err) { // eslint-disable-line no-unused-vars
+            ajaxCall.addEventListener('response', function(evt) { // eslint-disable-line no-unused-vars
+              self._executeMiddlewares(self._middlewares.postDelete, model, function(err) { // eslint-disable-line no-unused-vars
                 self.fire('oe-formdata-deleted', {
                   data: model,
                   oldData: model
@@ -433,7 +455,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
                 self.set(modelName, self.defaultVM ? JSON.parse(JSON.stringify(self.defaultVM)) : {});
               });
             });
-            ajaxCall.addEventListener('error', function (err) {
+            ajaxCall.addEventListener('error', function(err) {
               self.fire('oe-show-error', OEUtils.extractErrorMessage(err));
             });
 
@@ -445,7 +467,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         self.fire('oe-show-message', 'Can not delete a new record.');
       }
     },
-    doRequest: function (evt) {
+    doRequest: function(evt) {
 
       var btn = evt.currentTarget;
       var modelName = btn.getAttribute('oe-action-model') || this.modelAlias;
@@ -460,17 +482,17 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       ajaxCall.url = requestUrl;
       ajaxCall.method = httpType ? httpType : 'GET';
       ajaxCall.body = self[modelName];
-      ajaxCall.addEventListener('response', function (event) {
+      ajaxCall.addEventListener('response', function(event) {
         self.set(responseTo, event.detail.response);
         self.fire('oe-ajax-action-completed', event.detail.response);
       });
-      ajaxCall.addEventListener('error', function (err) {
+      ajaxCall.addEventListener('error', function(err) {
         self.set(responseTo, undefined);
         self.fire('oe-show-error', OEUtils.extractErrorMessage(err));
       });
       ajaxCall.generateRequest();
     },
-    _executeWorkflowAction: function (processId, processName, processData) {
+    _executeWorkflowAction: function(processId, processName, processData) {
       var self = this;
       var ajaxCall = document.createElement('oe-ajax');
       ajaxCall.contentType = 'application/json';
@@ -495,16 +517,16 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
         'name': processName,
         'data': processData
       };
-      ajaxCall.addEventListener('response', function (event) {
+      ajaxCall.addEventListener('response', function(event) {
         self.fire('oe-workflow-action-completed', event.detail.response);
       });
-      ajaxCall.addEventListener('error', function (err) {
+      ajaxCall.addEventListener('error', function(err) {
         self.fire('oe-workflow-action-failed', OEUtils.extractErrorMessage(err));
       });
 
       ajaxCall.generateRequest();
     },
-    attached: function () {
+    attached: function() {
       var self = this;
       self.modelAlias = self.modelAlias || 'vm';
       var actionButtons = self.querySelectorAll('[oe-action]');
@@ -518,7 +540,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           case 'event':
             {
               console.warn('Depricated [oe-action=event]. Use on-tap=doEvent instead.');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doEvent.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
@@ -526,7 +548,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           case 'new':
             {
               console.warn('Depricated [oe-action=new]. Use on-tap=doClear instead.');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doClear.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
@@ -534,7 +556,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           case 'copy':
             {
               console.warn('Depricated [oe-action=copy]. Use on-tap=doCopy instead.');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doCopy.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
@@ -542,7 +564,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           case 'save':
             {
               console.warn('Depricated [oe-action=save]. Use on-tap=doSave instead.');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doSave.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
@@ -550,7 +572,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           case 'submit':
             {
               console.warn('Depricated [oe-action=submit]. Use on-tap=doSubmit instead.');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doSubmit.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
@@ -558,7 +580,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           case 'validate':
             {
               console.warn('Depricated [oe-action=validate]. Use on-tap=doValidate instead.');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doValidate.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
@@ -566,7 +588,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           case 'delete':
             {
               console.warn('Depricated [oe-action=delete]. Use on-tap=doDelete instead.');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doDelete.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
@@ -575,7 +597,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
           case 'refresh':
             {
               console.warn('Depricated [oe-action=reset/refresh]. Use on-tap=doFetch instead.');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doFetch.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
@@ -585,14 +607,14 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
               console.warn(
                 'Depricated [oe-action=add]. Use on-tap=doValidate oe-valid-event="oe-model-add" instead.');
               button.setAttribute('oe-valid-event', 'oe-model-add');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doValidate.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
             }
           case 'cancel':
             {
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func, no-unused-vars
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func, no-unused-vars
                 self.fire('oe-model-cancel', self[modelName]);
                 self.set(modelName, self.defaultVM ? JSON.parse(JSON.stringify(self.defaultVM)) : {});
               });
@@ -604,14 +626,14 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
               console.warn(
                 'Depricated [oe-action=update]. Use on-tap=doValidate oe-valid-event="oe-model-update" instead.');
               button.setAttribute('oe-valid-event', 'oe-model-update');
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doValidate.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
             }
           case 'request-response':
             {
-              button.addEventListener('tap', function (evt) { // eslint-disable-line no-loop-func
+              button.addEventListener('tap', function(evt) { // eslint-disable-line no-loop-func
                 self.doRequest.call(self, evt); // eslint-disable-line no-useless-call
               });
               break;
@@ -626,7 +648,7 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
 
       for (i = 0; i < workflowButtons.length; i++) {
         var wfButton = workflowButtons[i];
-        wfButton.addEventListener('tap', function (evt) {
+        wfButton.addEventListener('tap', function(evt) {
           var btn = evt.target;
 
           var processId = btn.dataset.processId;
@@ -643,5 +665,4 @@ For workflow support, it also scans for elements having oe-workflow-action="..."
       }
     }
   }
-
 </script>
