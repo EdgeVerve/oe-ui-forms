@@ -82,6 +82,20 @@
         }
     };
 
+    function getSettings(name, options, mapping){
+        var value = undefined;
+        if(options && options[name] !== undefined){
+            value = options[name];
+        } else if(mapping && mapping.attributes){
+            var attr = mapping.attributes.find(function(v){
+                return v.name === name;
+            });
+            if(attr){
+                value = attr.value;
+            }
+        }
+        return value;
+    }
     /*setting the uitype to TypeMappings in-case user defined then user-defined values else to default values*/
     OEUtils.TypeMappings = OEUtils.TypeMappings || {};
     OEUtils.TypeMappings.date = OEUtils.TypeMappings.date || {
@@ -90,7 +104,7 @@
             if (!value) {
                 return value;
             }
-            var format = (options && options.format) ? options.format : 'DD MMM YYYY';
+            var format = getSettings('format', options, OEUtils.TypeMappings.date) || 'DD MMM YYYY';
             return OEUtils.DateUtils.format(value, format);
         }
     };
@@ -100,7 +114,7 @@
             if (!value) {
                 return value;
             }
-            var format = (options && options.format) ? options.format : 'DD MMM YYYY';
+            var format = getSettings('format', options, OEUtils.TypeMappings.timestamp) || 'DD MMM YYYY';
             return OEUtils.DateUtils.format(value, format);
         }
     };
@@ -117,10 +131,11 @@
     OEUtils.TypeMappings.number = OEUtils.TypeMappings.number || {
         uiType: 'oe-decimal',
         formatter: function(value, options) {
-            return ((value !== null && value !== undefined) && (options && options.precision)) ? Number(value).toLocaleString(
+            var precision = getSettings('precision', options, OEUtils.TypeMappings.number);
+            return ((value !== null && value !== undefined) && precision !== undefined) ? Number(value).toLocaleString(
                 undefined, {
-                    minimumFractionDigits: options.precision,
-                    maximumFractionDigits: options.precision
+                    minimumFractionDigits: precision,
+                    maximumFractionDigits: precision
                 }) : value;
         }
     };
@@ -142,18 +157,20 @@
     };
     OEUtils.TypeMappings.object = OEUtils.TypeMappings.object || {
         uiType: 'oe-json-input',
-        formatter: function(value, options) { // eslint-disable-line no-unused-vars
+        formatter: function(value, options) {
+            var indent = getSettings('indent', options, OEUtils.TypeMappings.object) || 2;
             if (value && typeof value === 'object') {
-                return JSON.stringify(value);
+                return JSON.stringify(value, null, indent);
             }
             return value;
         }
     };
     OEUtils.TypeMappings.model = OEUtils.TypeMappings.model || {
         uiType: 'oe-json-input',
-        formatter: function(value, options) { // eslint-disable-line no-unused-vars
+        formatter: function(value, options) {
+            var indent = getSettings('indent', options, OEUtils.TypeMappings.model) || 2;
             if (value && typeof value === 'object') {
-                return JSON.stringify(value);
+                return JSON.stringify(value, null, indent);
             }
             return value;
         }
@@ -177,7 +194,11 @@
             if (xhttp.readyState === 4 && xhttp.status === 200) {
                 var typeMappings = JSON.parse(xhttp.responseText);
                 typeMappings.forEach(function(mapping) {
-                    OEUtils.TypeMappings[mapping.type] = mapping;
+                    if(OEUtils.TypeMappings[mapping.type]){
+                        Object.assign(OEUtils.TypeMappings[mapping.type], mapping);
+                    } else {
+                        OEUtils.TypeMappings[mapping.type] = mapping;
+                    }
                 });
             }
         };
@@ -702,6 +723,7 @@
                         modelMeta[fieldId] = fmeta;
                     }
 
+                    fmeta.label = fmeta.label || camelCaseToLabel(fieldId);
                     if (fmeta.enumtype || fmeta.refcodetype) {
                         fmeta.type = 'combo';
                         fmeta.displayproperty = 'description';
@@ -741,6 +763,7 @@
             uimeta.metadata = uimeta.metadata || {};
             var modelMeta = uimeta.metadata.properties || {};
             uimeta.dynamicDefaults = uimeta.dynamicDefaults || [];
+             if(uimeta.autoInjectFields){
             modelMeta && Object.keys(modelMeta).forEach(function(fieldId) {
                 var fmeta = modelMeta[fieldId] || {};
                 fmeta.label = fmeta.label || camelCaseToLabel(fieldId);
@@ -750,6 +773,7 @@
                     OEUtils.setDeepValue(defaultVM, fieldId, (fmeta.type === 'boolean' && fmeta.default === undefined ? false : fmeta.default));
                 }
             });
+             }
 
             // field id in elements can be string -> fieldid
             // @something, something css selector
