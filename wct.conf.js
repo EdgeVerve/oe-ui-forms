@@ -23,8 +23,7 @@ module.exports = {
       dir: './coverage',
       reporters: ['text-summary', 'lcov'],
       include: [
-        '/**/*.js',
-        '/**/*.html'
+        '/**/*.js'
       ],
       exclude: [
         '/bower_components/**/*.html',

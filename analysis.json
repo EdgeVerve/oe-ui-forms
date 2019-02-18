@@ -1,0 +1,2328 @@
+{
+  "schema_version": "1.0.0",
+  "elements": [
+    {
+      "description": "# lazy-component\nThe lazy component is used to dynamically fetch the component from the url and set the model data to it.",
+      "summary": "",
+      "path": "lazy-component.js",
+      "properties": [
+        {
+          "name": "url",
+          "type": "string | null | undefined",
+          "description": "url for the file to import",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 34,
+              "column": 6
+            },
+            "end": {
+              "line": 37,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_setUrl\"",
+              "attributeType": "String"
+            }
+          }
+        },
+        {
+          "name": "model",
+          "type": "Object | null | undefined",
+          "description": "Data to be set on the element once imported",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 42,
+              "column": 6
+            },
+            "end": {
+              "line": 48,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "notify": true,
+              "attributeType": "Object"
+            }
+          },
+          "defaultValue": "{}"
+        },
+        {
+          "name": "emitOnSave",
+          "type": "string | null | undefined",
+          "description": "Event to be emitted when content is saved on the element.\nThis property is forwarded into the element as 'emit-on-save'",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 54,
+              "column": 6
+            },
+            "end": {
+              "line": 57,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_emitOnSaveChanged\"",
+              "attributeType": "String"
+            }
+          }
+        },
+        {
+          "name": "auto",
+          "type": "boolean | null | undefined",
+          "description": "Automatically load the element when the component is attached to the DOM.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 62,
+              "column": 6
+            },
+            "end": {
+              "line": 65,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Boolean"
+            }
+          },
+          "defaultValue": "false"
+        },
+        {
+          "name": "elementName",
+          "type": "string | null | undefined",
+          "description": "Name of the element to be created , if element definition is not exported by the component file.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 70,
+              "column": 6
+            },
+            "end": {
+              "line": 72,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          }
+        }
+      ],
+      "methods": [
+        {
+          "name": "_setUrl",
+          "description": "If the url is updated , the component loads the element",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 87,
+              "column": 2
+            },
+            "end": {
+              "line": 92,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "newUrl",
+              "type": "String"
+            },
+            {
+              "name": "oldUrl",
+              "type": "String"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "created",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 94,
+              "column": 2
+            },
+            "end": {
+              "line": 96,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "modelChanged",
+          "description": "When content of the binded model is changed , forwards the change to the element loaded",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 102,
+              "column": 2
+            },
+            "end": {
+              "line": 114,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "changed",
+              "type": "Object",
+              "description": "model change details"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_emitOnSaveChanged",
+          "description": "Forwards the property 'emitOnSave' to the element.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 121,
+              "column": 2
+            },
+            "end": {
+              "line": 125,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "oldVal",
+              "type": "String"
+            },
+            {
+              "name": "newVal",
+              "type": "String"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_registerEvent",
+          "description": "Registers a element and adds listener on the 'model' of the property.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 132,
+              "column": 2
+            },
+            "end": {
+              "line": 150,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "el",
+              "type": "HTMLElement",
+              "description": "Element loaded from the URL."
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_loadElement",
+          "description": "Imports the element and loads the element into the DOM.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 155,
+              "column": 2
+            },
+            "end": {
+              "line": 204,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 206,
+              "column": 2
+            },
+            "end": {
+              "line": 212,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "newRecord",
+          "description": "Merges defaultVM of the form with the passed parameter and sets it on the element.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 218,
+              "column": 2
+            },
+            "end": {
+              "line": 224,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "overrideObj",
+              "type": "Object",
+              "description": "data to override on defaultVM"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        }
+      ],
+      "staticMethods": [],
+      "demos": [
+        {
+          "url": "demo/demo-meta-polymer.html",
+          "description": ""
+        }
+      ],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 18,
+          "column": 0
+        },
+        "end": {
+          "line": 225,
+          "column": 1
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "lazyComponent",
+      "attributes": [
+        {
+          "name": "url",
+          "description": "url for the file to import",
+          "sourceRange": {
+            "start": {
+              "line": 34,
+              "column": 6
+            },
+            "end": {
+              "line": 37,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "model",
+          "description": "Data to be set on the element once imported",
+          "sourceRange": {
+            "start": {
+              "line": 42,
+              "column": 6
+            },
+            "end": {
+              "line": 48,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "emit-on-save",
+          "description": "Event to be emitted when content is saved on the element.\nThis property is forwarded into the element as 'emit-on-save'",
+          "sourceRange": {
+            "start": {
+              "line": 54,
+              "column": 6
+            },
+            "end": {
+              "line": 57,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "auto",
+          "description": "Automatically load the element when the component is attached to the DOM.",
+          "sourceRange": {
+            "start": {
+              "line": 62,
+              "column": 6
+            },
+            "end": {
+              "line": 65,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "element-name",
+          "description": "Name of the element to be created , if element definition is not exported by the component file.",
+          "sourceRange": {
+            "start": {
+              "line": 70,
+              "column": 6
+            },
+            "end": {
+              "line": 72,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "model-changed",
+          "description": "Fired when the `model` property changes.",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "lazy-component"
+    },
+    {
+      "description": "# oe-async-validator\n`oe-async-validator` validates fields on the bound `model` on the server based on the provided `requesturl`.",
+      "summary": "",
+      "path": "validators/oe-async-validator.js",
+      "properties": [
+        {
+          "name": "fields",
+          "type": "Array | null | undefined",
+          "description": "Array of the field ids",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 33,
+              "column": 6
+            },
+            "end": {
+              "line": 35,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        },
+        {
+          "name": "model",
+          "type": "Object | null | undefined",
+          "description": "Model object of the fields",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 40,
+              "column": 6
+            },
+            "end": {
+              "line": 42,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "requesturl",
+          "type": "string | null | undefined",
+          "description": "Url to verify the validation",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 47,
+              "column": 6
+            },
+            "end": {
+              "line": 49,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          }
+        },
+        {
+          "name": "ensure",
+          "type": "string | null | undefined",
+          "description": "String denoting whether the value should be 'present' or 'absent' in the response\nof the url call.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 55,
+              "column": 6
+            },
+            "end": {
+              "line": 58,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"present\""
+        },
+        {
+          "name": "error",
+          "type": "string | null | undefined",
+          "description": "Error message to display when the validation fails",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 63,
+              "column": 6
+            },
+            "end": {
+              "line": 66,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"Async validation failed.\""
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "Once attached to dom sets up ajax component to perform validations and registers the validator",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 73,
+              "column": 2
+            },
+            "end": {
+              "line": 130,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "validate",
+          "description": "Custom validation to check presence or absence of the value based on ajax request",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 135,
+              "column": 2
+            },
+            "end": {
+              "line": 156,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 17,
+          "column": 0
+        },
+        "end": {
+          "line": 157,
+          "column": 1
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "oeAsyncValidator",
+      "attributes": [
+        {
+          "name": "fields",
+          "description": "Array of the field ids",
+          "sourceRange": {
+            "start": {
+              "line": 33,
+              "column": 6
+            },
+            "end": {
+              "line": 35,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "model",
+          "description": "Model object of the fields",
+          "sourceRange": {
+            "start": {
+              "line": 40,
+              "column": 6
+            },
+            "end": {
+              "line": 42,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "requesturl",
+          "description": "Url to verify the validation",
+          "sourceRange": {
+            "start": {
+              "line": 47,
+              "column": 6
+            },
+            "end": {
+              "line": 49,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "ensure",
+          "description": "String denoting whether the value should be 'present' or 'absent' in the response\nof the url call.",
+          "sourceRange": {
+            "start": {
+              "line": 55,
+              "column": 6
+            },
+            "end": {
+              "line": 58,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "error",
+          "description": "Error message to display when the validation fails",
+          "sourceRange": {
+            "start": {
+              "line": 63,
+              "column": 6
+            },
+            "end": {
+              "line": 66,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        }
+      ],
+      "events": [],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "oe-async-validator",
+      "mixins": [
+        "OECommonMixin"
+      ]
+    },
+    {
+      "description": "# oe-block-validator\nProvides a validation section to validate a subset of fields on form\n\n```\n<oe-block-validator>\n    <oe-vbox>\n        <paper-input label=\"First Name\"></paper-input>\n        <paper-input label=\"Last Name\"></paper-input>\n        <paper-input label=\"City\"></paper-input>\n        <paper-input label=\"Zip Code\"></paper-input>\n    </oe-vbox>\n<oe-block-validator>\n```",
+      "summary": "",
+      "path": "validators/oe-block-validator.js",
+      "properties": [
+        {
+          "name": "fields",
+          "type": "Array | null | undefined",
+          "description": "fields that would participate in validation",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 45,
+              "column": 3
+            },
+            "end": {
+              "line": 47,
+              "column": 4
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        },
+        {
+          "name": "model",
+          "type": "Object | null | undefined",
+          "description": "Model on which expression will be evaluated",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 52,
+              "column": 3
+            },
+            "end": {
+              "line": 54,
+              "column": 4
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "error",
+          "type": "string | null | undefined",
+          "description": "error message/code to raise when validation fails",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 59,
+              "column": 3
+            },
+            "end": {
+              "line": 62,
+              "column": 4
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"Fields are invalid\""
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 66,
+              "column": 1
+            },
+            "end": {
+              "line": 84,
+              "column": 2
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "validate",
+          "description": "Performs validation and triggers appropriate validation event.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 89,
+              "column": 1
+            },
+            "end": {
+              "line": 99,
+              "column": 2
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 29,
+          "column": 0
+        },
+        "end": {
+          "line": 100,
+          "column": 1
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "oeBlockValidator",
+      "attributes": [
+        {
+          "name": "fields",
+          "description": "fields that would participate in validation",
+          "sourceRange": {
+            "start": {
+              "line": 45,
+              "column": 3
+            },
+            "end": {
+              "line": 47,
+              "column": 4
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "model",
+          "description": "Model on which expression will be evaluated",
+          "sourceRange": {
+            "start": {
+              "line": 52,
+              "column": 3
+            },
+            "end": {
+              "line": 54,
+              "column": 4
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "error",
+          "description": "error message/code to raise when validation fails",
+          "sourceRange": {
+            "start": {
+              "line": 59,
+              "column": 3
+            },
+            "end": {
+              "line": 62,
+              "column": 4
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        }
+      ],
+      "events": [],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "oe-block-validator",
+      "mixins": [
+        "OECommonMixin",
+        "OEFormValidationMixin"
+      ]
+    },
+    {
+      "description": "# oe-combination-validator\n`oe-combination-validator` evaluates fields on the bound `model` and ensures the combination is one of the defined `combinations`.",
+      "summary": "",
+      "path": "validators/oe-combination-validator.js",
+      "properties": [
+        {
+          "name": "fields",
+          "type": "Array | null | undefined",
+          "description": "fields that would participate in validation",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 52,
+              "column": 6
+            },
+            "end": {
+              "line": 54,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        },
+        {
+          "name": "model",
+          "type": "Object | null | undefined",
+          "description": "Model on which expression will be evaluated",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 59,
+              "column": 6
+            },
+            "end": {
+              "line": 61,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "combinations",
+          "type": "Array | null | undefined",
+          "description": "array of valid combinations.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 66,
+              "column": 6
+            },
+            "end": {
+              "line": 71,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          },
+          "defaultValue": "[]"
+        },
+        {
+          "name": "ensure",
+          "type": "string | null | undefined",
+          "description": "String denoting to check if combination should exist",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 76,
+              "column": 6
+            },
+            "end": {
+              "line": 79,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"present\""
+        },
+        {
+          "name": "error",
+          "type": "string | null | undefined",
+          "description": "error message/code to raise when validation fails",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 84,
+              "column": 6
+            },
+            "end": {
+              "line": 87,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"Invalid Combination\""
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 91,
+              "column": 2
+            },
+            "end": {
+              "line": 94,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "isEquivalent",
+          "description": "Checks if two javascript objects are equivalent. Only top level properties are checked for equivalence.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 99,
+              "column": 2
+            },
+            "end": {
+              "line": 123,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "a"
+            },
+            {
+              "name": "b"
+            }
+          ]
+        },
+        {
+          "name": "validate",
+          "description": "Performs validation and triggers appropriate validation event.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 128,
+              "column": 2
+            },
+            "end": {
+              "line": 168,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 17,
+          "column": 0
+        },
+        "end": {
+          "line": 169,
+          "column": 1
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "oeCombinationValidator",
+      "attributes": [
+        {
+          "name": "fields",
+          "description": "fields that would participate in validation",
+          "sourceRange": {
+            "start": {
+              "line": 52,
+              "column": 6
+            },
+            "end": {
+              "line": 54,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "model",
+          "description": "Model on which expression will be evaluated",
+          "sourceRange": {
+            "start": {
+              "line": 59,
+              "column": 6
+            },
+            "end": {
+              "line": 61,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "combinations",
+          "description": "array of valid combinations.",
+          "sourceRange": {
+            "start": {
+              "line": 66,
+              "column": 6
+            },
+            "end": {
+              "line": 71,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "ensure",
+          "description": "String denoting to check if combination should exist",
+          "sourceRange": {
+            "start": {
+              "line": 76,
+              "column": 6
+            },
+            "end": {
+              "line": 79,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "error",
+          "description": "error message/code to raise when validation fails",
+          "sourceRange": {
+            "start": {
+              "line": 84,
+              "column": 6
+            },
+            "end": {
+              "line": 87,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-error",
+          "description": "Fired when validation fails",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-ok",
+          "description": "Fired when validation succeeds",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "register-validator",
+          "description": "Fired when validator is attached",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "oe-combination-validator",
+      "mixins": [
+        "OECommonMixin"
+      ]
+    },
+    {
+      "description": "# oe-eq-validator\n`oe-eq-validator` evaluates values of two fields on the bound `model` to make sure they are equal/same.",
+      "summary": "",
+      "path": "validators/oe-eq-validator.js",
+      "properties": [
+        {
+          "name": "fields",
+          "type": "Array | null | undefined",
+          "description": "fields that would participate in validation",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 50,
+              "column": 6
+            },
+            "end": {
+              "line": 52,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        },
+        {
+          "name": "model",
+          "type": "Object | null | undefined",
+          "description": "Model on which expression will be evaluated",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 57,
+              "column": 6
+            },
+            "end": {
+              "line": 59,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "error",
+          "type": "string | null | undefined",
+          "description": "error message/code to raise when validation fails",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 64,
+              "column": 6
+            },
+            "end": {
+              "line": 67,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"Values do not match\""
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 71,
+              "column": 2
+            },
+            "end": {
+              "line": 80,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "validate",
+          "description": "Performs validation and triggers appropriate validation event.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 85,
+              "column": 2
+            },
+            "end": {
+              "line": 101,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 17,
+          "column": 0
+        },
+        "end": {
+          "line": 102,
+          "column": 1
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "oeEqValidator",
+      "attributes": [
+        {
+          "name": "fields",
+          "description": "fields that would participate in validation",
+          "sourceRange": {
+            "start": {
+              "line": 50,
+              "column": 6
+            },
+            "end": {
+              "line": 52,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "model",
+          "description": "Model on which expression will be evaluated",
+          "sourceRange": {
+            "start": {
+              "line": 57,
+              "column": 6
+            },
+            "end": {
+              "line": 59,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "error",
+          "description": "error message/code to raise when validation fails",
+          "sourceRange": {
+            "start": {
+              "line": 64,
+              "column": 6
+            },
+            "end": {
+              "line": 67,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-error",
+          "description": "Fired when validation fails",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-ok",
+          "description": "Fired when validation succeeds",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "register-validator",
+          "description": "Fired when validator is attached",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "oe-eq-validator",
+      "mixins": [
+        "OECommonMixin"
+      ]
+    },
+    {
+      "description": "# oe-expression-validator\n`oe-expression-validator` evaluates an `expression` on the bound `model` to decide the model validity.",
+      "summary": "",
+      "path": "validators/oe-expression-validator.js",
+      "properties": [
+        {
+          "name": "fields",
+          "type": "Array | null | undefined",
+          "description": "fields that would participate in validation",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 52,
+              "column": 6
+            },
+            "end": {
+              "line": 54,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        },
+        {
+          "name": "model",
+          "type": "Object | null | undefined",
+          "description": "Model on which expression will be evaluated",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 59,
+              "column": 6
+            },
+            "end": {
+              "line": 61,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "expression",
+          "type": "string | null | undefined",
+          "description": "validation expression",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 66,
+              "column": 6
+            },
+            "end": {
+              "line": 68,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          }
+        },
+        {
+          "name": "error",
+          "type": "string | null | undefined",
+          "description": "error message/code to raise when validation fails",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 73,
+              "column": 6
+            },
+            "end": {
+              "line": 76,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"Invalid Combination\""
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 80,
+              "column": 2
+            },
+            "end": {
+              "line": 87,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "validate",
+          "description": "Performs validation and triggers appropriate validation event.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 92,
+              "column": 2
+            },
+            "end": {
+              "line": 110,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 17,
+          "column": 0
+        },
+        "end": {
+          "line": 111,
+          "column": 1
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "oeExpressionValidator",
+      "attributes": [
+        {
+          "name": "fields",
+          "description": "fields that would participate in validation",
+          "sourceRange": {
+            "start": {
+              "line": 52,
+              "column": 6
+            },
+            "end": {
+              "line": 54,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "model",
+          "description": "Model on which expression will be evaluated",
+          "sourceRange": {
+            "start": {
+              "line": 59,
+              "column": 6
+            },
+            "end": {
+              "line": 61,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "expression",
+          "description": "validation expression",
+          "sourceRange": {
+            "start": {
+              "line": 66,
+              "column": 6
+            },
+            "end": {
+              "line": 68,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "error",
+          "description": "error message/code to raise when validation fails",
+          "sourceRange": {
+            "start": {
+              "line": 73,
+              "column": 6
+            },
+            "end": {
+              "line": 76,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-error",
+          "description": "Fired when validation fails",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-ok",
+          "description": "Fired when validation succeeds",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "register-validator",
+          "description": "Fired when validator is attached",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "oe-expression-validator",
+      "mixins": [
+        "OECommonMixin"
+      ]
+    },
+    {
+      "description": "# oe-le-validator\n`oe-le-validator` evaluates values of two fields on the bound `model` to make sure value of first field (fields[0]) is less-than-or-equal-to the second field (fields[1]).",
+      "summary": "",
+      "path": "validators/oe-le-validator.js",
+      "properties": [
+        {
+          "name": "fields",
+          "type": "Array | null | undefined",
+          "description": "fields that would participate in validation",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 49,
+              "column": 6
+            },
+            "end": {
+              "line": 51,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        },
+        {
+          "name": "model",
+          "type": "Object | null | undefined",
+          "description": "Model on which expression will be evaluated",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 56,
+              "column": 6
+            },
+            "end": {
+              "line": 58,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "error",
+          "type": "string | null | undefined",
+          "description": "error message/code to raise when validation fails",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 63,
+              "column": 6
+            },
+            "end": {
+              "line": 66,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"Value in to field must not be lesser than value in from field\""
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 70,
+              "column": 2
+            },
+            "end": {
+              "line": 79,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "validate",
+          "description": "Performs validation and triggers appropriate validation event.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 84,
+              "column": 2
+            },
+            "end": {
+              "line": 99,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 17,
+          "column": 0
+        },
+        "end": {
+          "line": 100,
+          "column": 1
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "oeLeValidator",
+      "attributes": [
+        {
+          "name": "fields",
+          "description": "fields that would participate in validation",
+          "sourceRange": {
+            "start": {
+              "line": 49,
+              "column": 6
+            },
+            "end": {
+              "line": 51,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "model",
+          "description": "Model on which expression will be evaluated",
+          "sourceRange": {
+            "start": {
+              "line": 56,
+              "column": 6
+            },
+            "end": {
+              "line": 58,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "error",
+          "description": "error message/code to raise when validation fails",
+          "sourceRange": {
+            "start": {
+              "line": 63,
+              "column": 6
+            },
+            "end": {
+              "line": 66,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-error",
+          "description": "Fired when validation fails",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-ok",
+          "description": "Fired when validation succeeds",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "register-validator",
+          "description": "Fired when validator is attached",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "oe-le-validator",
+      "mixins": [
+        "OECommonMixin"
+      ]
+    },
+    {
+      "description": "# oe-lt-validator\n`oe-lt-validator` evaluates values of two fields on the bound `model` to make sure value of first field (fields[0]) is less-than second field (fields[1]).",
+      "summary": "",
+      "path": "validators/oe-lt-validator.js",
+      "properties": [
+        {
+          "name": "fields",
+          "type": "Array | null | undefined",
+          "description": "fields that would participate in validation",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 33,
+              "column": 6
+            },
+            "end": {
+              "line": 35,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        },
+        {
+          "name": "model",
+          "type": "Object | null | undefined",
+          "description": "Model on which expression will be evaluated",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 40,
+              "column": 6
+            },
+            "end": {
+              "line": 42,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "error",
+          "type": "string | null | undefined",
+          "description": "error message/code to raise when validation fails",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 47,
+              "column": 6
+            },
+            "end": {
+              "line": 50,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"Value in to field must not be lesser than value in from field\""
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 71,
+              "column": 2
+            },
+            "end": {
+              "line": 80,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "validate",
+          "description": "Performs validation and triggers appropriate validation event.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 85,
+              "column": 2
+            },
+            "end": {
+              "line": 100,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 17,
+          "column": 0
+        },
+        "end": {
+          "line": 101,
+          "column": 1
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "oeLtValidator",
+      "attributes": [
+        {
+          "name": "fields",
+          "description": "fields that would participate in validation",
+          "sourceRange": {
+            "start": {
+              "line": 33,
+              "column": 6
+            },
+            "end": {
+              "line": 35,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "model",
+          "description": "Model on which expression will be evaluated",
+          "sourceRange": {
+            "start": {
+              "line": 40,
+              "column": 6
+            },
+            "end": {
+              "line": 42,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "error",
+          "description": "error message/code to raise when validation fails",
+          "sourceRange": {
+            "start": {
+              "line": 47,
+              "column": 6
+            },
+            "end": {
+              "line": 50,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-error",
+          "description": "Fired when validation fails",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-ok",
+          "description": "Fired when validation succeeds",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "register-validator",
+          "description": "Fired when validator is attached",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "oe-lt-validator",
+      "mixins": [
+        "OECommonMixin"
+      ]
+    },
+    {
+      "description": "# oe-ne-validator\n`oe-ne-validator` evaluates values of two fields on the bound `model` to make sure they are *not* same.",
+      "summary": "",
+      "path": "validators/oe-ne-validator.js",
+      "properties": [
+        {
+          "name": "fields",
+          "type": "Array | null | undefined",
+          "description": "Fields that would participate in validation",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 34,
+              "column": 6
+            },
+            "end": {
+              "line": 36,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        },
+        {
+          "name": "model",
+          "type": "Object | null | undefined",
+          "description": "Model on which expression will be evaluated",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 41,
+              "column": 6
+            },
+            "end": {
+              "line": 43,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "error",
+          "type": "string | null | undefined",
+          "description": "error message/code to raise when validation fails",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 48,
+              "column": 6
+            },
+            "end": {
+              "line": 51,
+              "column": 7
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          },
+          "defaultValue": "\"Values are same\""
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 73,
+              "column": 2
+            },
+            "end": {
+              "line": 82,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "validate",
+          "description": "Performs validation and triggers appropriate validation event.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 87,
+              "column": 2
+            },
+            "end": {
+              "line": 103,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 18,
+          "column": 0
+        },
+        "end": {
+          "line": 104,
+          "column": 1
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "oeNeValidator",
+      "attributes": [
+        {
+          "name": "fields",
+          "description": "Fields that would participate in validation",
+          "sourceRange": {
+            "start": {
+              "line": 34,
+              "column": 6
+            },
+            "end": {
+              "line": 36,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "model",
+          "description": "Model on which expression will be evaluated",
+          "sourceRange": {
+            "start": {
+              "line": 41,
+              "column": 6
+            },
+            "end": {
+              "line": 43,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "error",
+          "description": "error message/code to raise when validation fails",
+          "sourceRange": {
+            "start": {
+              "line": 48,
+              "column": 6
+            },
+            "end": {
+              "line": 51,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-error",
+          "description": "Fired when validation fails",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "oe-validator-ok",
+          "description": "Fired when validation succeeds",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "register-validator",
+          "description": "Fired when validator is attached",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "oe-ne-validator",
+      "mixins": [
+        "OECommonMixin"
+      ]
+    }
+  ],
+  "mixins": [
+    {
+      "description": "MetaMixin to store meta data of the generated element",
+      "summary": "",
+      "path": "meta-polymer.js",
+      "properties": [],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 311,
+              "column": 8
+            },
+            "end": {
+              "line": 316,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 260,
+          "column": 0
+        },
+        "end": {
+          "line": 318,
+          "column": 2
+        }
+      },
+      "privacy": "public",
+      "name": "MetaMixin",
+      "attributes": [],
+      "events": [],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": []
+    }
+  ],
+  "classes": [
+    {
+      "description": "",
+      "summary": "",
+      "path": "meta-polymer.js",
+      "properties": [],
+      "methods": [],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 1400,
+          "column": 24
+        },
+        "end": {
+          "line": 1428,
+          "column": 9
+        }
+      },
+      "privacy": "public",
+      "name": "tempClass"
+    }
+  ]
+}
