@@ -20,7 +20,7 @@
     "@polymer/iron-test-helpers": "3.0.1",
     "@polymer/paper-tooltip": "3.0.1",
     "@webcomponents/webcomponentsjs": "2.2.7",
-    "fakerest": "^2.1.0",
+    "fakerest": "2.1.0",
     "oe-date": "git+http://evgit/oecloud.io/oe-date.git#master",
     "oe-input": "git+http://evgit/oecloud.io/oe-input.git#master",
     "@polymer/test-fixture": "4.0.2",
