@@ -7,7 +7,6 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import { OECommonMixin } from "oe-mixins/oe-common-mixin.js";
 import { DomApi } from "@polymer/polymer/lib/legacy/polymer.dom.js";
-import { importModule } from "dynamic-import-polyfill/importModule.js";
 
 /**
  * # lazy-component
@@ -164,7 +163,7 @@ class lazyComponent extends OECommonMixin(PolymerElement) {
     }
     self.initialised = true;
     
-    importModule(self.url).then(function (e) {
+    import(self.url).then(function (e) {
       self.loaded = false;
       var elName;
       if (typeof e.default === "function" && e.default.is) {
