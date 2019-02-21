@@ -764,9 +764,8 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
                 
                 defaultFormUrl = defaultFormUrl || (restApiRoot + '/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
                     '-form.html');
-                defaultFormUrl && node.setAttribute('editor-form-url', defaultFormUrl);
             }
-            
+            defaultFormUrl && node.setAttribute('editor-form-url', defaultFormUrl);
         }
 
         if (fmeta.textContent) {
