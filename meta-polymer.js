@@ -754,13 +754,19 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
             }
         } else {
             var recordHandling = 'local';
-            //node.setAttribute('columns', '[[fields.' + fieldId + '.columns]]');
-            node.setAttribute('model', fmeta.modeltype);
-            fieldId && node.setAttribute('items', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
-            var defaultFormUrl = restApiRoot + '/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
-                '-form.html';
-            node.setAttribute('editor-form-url', fmeta['editor-form-url'] || defaultFormUrl);
             node.setAttribute('record-handling', recordHandling);
+            //node.setAttribute('columns', '[[fields.' + fieldId + '.columns]]');
+            fieldId && node.setAttribute('items', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
+
+            var defaultFormUrl = fmeta['editor-form-url'];
+            if(fmeta.modeltype) {
+                node.setAttribute('model', fmeta.modeltype);
+                
+                defaultFormUrl = defaultFormUrl || (restApiRoot + '/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
+                    '-form.html');
+                defaultFormUrl && node.setAttribute('editor-form-url', defaultFormUrl);
+            }
+            
         }
 
         if (fmeta.textContent) {
