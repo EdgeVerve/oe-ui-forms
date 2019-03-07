@@ -1,13 +1,38 @@
-<!--
-©2018-2019 EdgeVerve Systems Limited (a fully owned Infosys subsidiary), Bangalore, India. All Rights Reserved.
--->
-<!--
-        @author Gowtham_D02
-        @description Default tab form template from oe-ui-forms with drafting of data.
--->
-<link rel="import" href="/bower_components/oe-ui-forms/styles/oe-layout-styles.html">
-<dom-module id=":componentName">
-    <template>
+/**
+ * @license
+ * ©2018-2019 EdgeVerve Systems Limited (a fully owned Infosys subsidiary),
+ * Bangalore, India. All Rights Reserved.
+ */
+import { html, PolymerElement } from "/node_modules/@polymer/polymer/polymer-element.js";
+import "/node_modules/oe-ui-forms/meta-polymer.js";
+import "/node_modules/@polymer/iron-pages/iron-pages.js";
+import "/node_modules/@polymer/iron-icon/iron-icon.js";
+import "/node_modules/@polymer/iron-icons/iron-icons.js";
+import "/node_modules/@polymer/paper-button/paper-button.js";
+import "/node_modules/@polymer/iron-flex-layout/iron-flex-layout.js";
+import "/node_modules/@polymer/iron-flex-layout/iron-flex-layout-classes.js";
+import "/node_modules/oe-ui-misc/oe-stepper.js";
+import "/node_modules/oe-i18n-msg/oe-i18n-msg.js";
+import { OEFormValidationMixin } from "/node_modules/oe-mixins/form-mixins/oe-form-validation-mixin.js";
+import { OEModelHandler } from "/node_modules/oe-mixins/form-mixins/oe-model-handler.js";
+import { OEFormMessagesMixin } from "/node_modules/oe-mixins/form-mixins/oe-form-messages-mixin.js";
+import { OETabFormMixin } from "/node_modules/oe-mixins/form-mixins/oe-tab-form-mixin.js";
+
+/**
+ * @templateInformation
+ *    @className tabbedForm
+ *    @description Form template with paper-tab UI
+ *    @modelRequired true   
+ */
+
+ /**
+ * @customElement
+ * @polymer
+ */
+class tabbedForm extends OEFormMessagesMixin(OEModelHandler(OETabFormMixin(OEFormValidationMixin(PolymerElement)))) {
+    static get template() {
+        return html`
+        
         <style include="iron-flex iron-flex-alignment">
             :host {
                 display: block;
@@ -109,55 +134,57 @@
                 </div>
             </div>
         </div>
-    </template>
-    <script>
-        MetaPolymer({
-            is: ":componentName",
-            properties: {
-                :modelAlias: {
-                    type: 'object',
-                    notify: true
-                }
-            },
-            behaviors: [
-                OEUtils.TabFormBehavior,
-                OEUtils.DraftBehavior
-            ],
-            attached: function () {
-                this.set('_draftConfig', {
-                    'componentProps': ['selectedStep']
-                });
-            },
-            _getVerticalClass: function (vertical) {
-                return vertical ? "vertical" : "horizontal";
-            },
-            _gotoNextorSave: function () {
-                var ironPages = this.$["form-pages"];
-                var currentPage = ironPages.selectedItem;
-                if (currentPage.validate) {
-                    currentPage.validate().then(function (status) {
-                        var stepErrorPath = 'stepperSteps.'+this.selectedStep+'.hasError';
-                        var stepCompletedPath = 'stepperSteps.'+this.selectedStep+'.isCompleted';
-                        this.set(stepErrorPath,!status.valid);
-                        this.set(stepCompletedPath,status.valid);
-                        if(!status.valid){
-                            this.fire('oe-show-error',currentPage.error);
-                            return;
-                        }
-                        if (this.stepperSteps.length === (this.selectedStep + 1)) {
-                            this.doSave();
-                        } else {
-                            this.saveDraft(null, null, this._goNext.bind(this));
-                        }
-                    }.bind(this))
-                } else {
-                    if (this.stepperSteps.length === (this.selectedStep + 1)) {
-                        this.doSave();
-                    } else {
-                        this.saveDraft(null, null, this._goNext.bind(this));
-                    }
-                }
+        `;
+    }
+
+    static get is() {
+        return ":componentName";
+    }
+
+    static get properties() {
+        return {
+            ":modelAlias": {
+                type: Object,
+                notify: true
             }
-        });
-    </script>
-</dom-module>
+        };
+    }
+    connectedCallback() {
+        super.connectedCallback();
+        this.set('isVerticalLayout', false);
+    }
+    _getVerticalClass(vertical) {
+        return vertical ? "vertical" : "horizontal";
+    }
+    _gotoNextorSave() {
+        var ironPages = this.$["form-pages"];
+        var currentPage = ironPages.selectedItem;
+        if (currentPage.validate) {
+            currentPage.validate().then(function (status) {
+                var stepErrorPath = 'stepperSteps.' + this.selectedStep + '.hasError';
+                var stepCompletedPath = 'stepperSteps.' + this.selectedStep + '.isCompleted';
+                this.set(stepErrorPath, !status.valid);
+                this.set(stepCompletedPath, status.valid);
+                if (!status.valid) {
+                    this.fire('oe-show-error', currentPage.error);
+                    return;
+                }
+                if (this.stepperSteps.length === (this.selectedStep + 1)) {
+                    this.doSave();
+                } else {
+                    this._goNext();
+                }
+            }.bind(this));
+        } else {
+            if (this.stepperSteps.length === (this.selectedStep + 1)) {
+                this.doSave();
+            } else {
+                this._goNext();
+            }
+        }
+    }
+}
+
+window.customElements.metadefine(tabbedForm.is, tabbedForm);
+
+export const tabbedFormClass = tabbedForm;

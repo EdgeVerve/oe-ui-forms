@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>meta-polymer demo</title>
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+    <script type="module">
+        import { html,PolymerElement } from '../node_modules/@polymer/polymer/polymer-element.js';
+        import '@polymer/iron-demo-helpers/demo-pages-shared-styles'; 
+        import '@polymer/iron-demo-helpers/demo-snippet'; 
+        import '@polymer/iron-flex-layout/iron-flex-layout';
+        import '@polymer/polymer/lib/elements/custom-style'; 
+        import "@polymer/paper-tooltip/paper-tooltip";
+        import "oe-input/oe-input"; 
+        import "oe-date/oe-date"; 
+        import "oe-input/oe-decimal"; 
+        import "../validators/oe-eq-validator"; 
+        
+        window.PolymerElement = PolymerElement;
+        window.html = html;
+
+        window.OEUtils = window.OEUtils || {};
+        var OEUtils = window.OEUtils;
+
+        //cache to store meta data
+        OEUtils.metadataCache = OEUtils.metadataCache || {};
+
+        OEUtils.geturl = function (url) {
+            return url;
+        }
+    </script>
+
+    <script type="module" src="../meta-polymer.js"></script>
+
+    <custom-style>
+        <style is="custom-style" include="demo-pages-shared-styles">
+        </style>
+    </custom-style>
+</head>
+
+<body>
+    <div class="vertical-section-container centered">
+
+        <h3>Simple Polymer Form</h3>
+        <demo-snippet>
+            <template>
+                <simple-form></simple-form>
+                <script>
+                    class SimpleForm extends window.PolymerElement{
+                        static get template(){
+                            return window.html`
+                                <style>
+                                    #btn-container{
+                                        display:flex;
+                                        padding:8px;
+                                        background:#F8F8F8;
+                                    }
+
+                                    #content-container{
+                                        padding: 8px 16px;
+                                        background: #F0F0F0;
+                                    }
+
+                                    .layout-2{
+                                        display:flex;
+                                        flex-wrap:wrap;
+                                        justify-content: space-between;
+                                    }
+                                    .layout-2 > *{
+                                        width:calc(50% - 8px);
+                                        padding:8px 0px;
+                                    }
+
+                                    paper-button[primary]{
+                                        background:#FF9800;
+                                        color:#FFF;
+                                    }
+                                </style>
+                                <div id="btn-container">
+                                    <paper-button raised primary on-tap="displayContent">Display</paper-button>
+                                    <paper-button raised on-tap="clearContent">Clear</paper-button>
+                                </div>
+                                <div id="content-container">
+                                    <oe-input label="First Name" value="{{formData.firstName}}"></oe-input>
+                                    <oe-input label="Last Name" value="{{formData.lastName}}"></oe-input>
+                                </div>
+                            `
+                        }
+
+                        static get properties(){
+                            return {
+                                formData:{
+                                    type:Object,
+                                    notify:true
+                                }
+                            }
+                        }
+
+                        displayContent(){
+                            alert(JSON.stringify(this.formData,null,2));
+                        }
+
+                        clearContent(){
+                            this.set('formData',{});
+                        }
+                    }
+
+                    window.customElements.define("simple-form", SimpleForm);
+                </script>
+            </template>
+        </demo-snippet>
+
+
+
+        <h3>Meta Polymer : Dynamic containers and fields</h3>
+        <demo-snippet>
+            <template>
+                <custom-form></custom-form>
+                <script type="module">
+                    window.OEUtils.metadataCache['custom-form'] = {
+                        'componentName': 'custom-form',
+                        'modelAlias':'formData',
+                        'container':{
+                            target:"#content-container",
+                            nodeAttributes:{
+                                "class":"layout-2"
+                            },
+                            steps:[
+                                {
+                                    "id":"additional-fields"
+                                }
+                            ]
+                        },
+                        'fields':[
+                            {
+                                'fieldId':'age',
+                                'uitype':'oe-decimal',
+                                'precision':'0',
+                                'container':'additional-fields'
+                            },
+                            {
+                                'fieldId':'bloodType',
+                                'container':'additional-fields'
+                            }]
+                    };
+
+                    window.customElements.metadefine("custom-form", SimpleForm);
+                </script>
+            </template>
+        </demo-snippet>
+
+        <h3>Meta Polymer : Dynamic content and functions</h3>
+        <demo-snippet>
+            <template>
+                <custom-modified-form></custom-modified-form>
+                <script type="module">
+                    window.OEUtils.metadataCache['custom-modified-form'] = {
+                        'componentName': 'custom-modified-form',
+                        'modelAlias':'formData',
+                        'content':'<paper-button raised oe-container="btn-container" on-tap="_populateData">Fill</paper-button>',
+                        'polymerConfig':{
+                            'functions':{
+                                '_populateData':'function(){this.set("formData.firstName","Goku"); }'
+                            }
+                        },
+                        "elements":{
+                            "age":{
+                                "default":18
+                            }
+                        }
+                    };
+                    let formClass = window.customElements.get('custom-form');
+                    window.customElements.metadefine('custom-modified-form', formClass);
+                </script>
+            </template>
+        </demo-snippet>
+    </div>
+
+</body>
+
+</html>
