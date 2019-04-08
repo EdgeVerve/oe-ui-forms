@@ -6,6 +6,7 @@
 import { OEUtilityMixin } from "oe-mixins/oe-utils-mixin.js";
 import { OECommonMixin } from "oe-mixins/oe-common-mixin.js";
 import "oe-utils/oe-utils.js";
+import "oe-utils/date-utils.js";
 
 window.OEUtils = window.OEUtils || {};
 var OEUtils = window.OEUtils;
@@ -839,8 +840,10 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
             return container;
         }else{
             container = defaultInject.deepQuery(query) || templateCont.deepQuery(query);
-            containersMap[query] = container;
-            return container || defaultInject;
+            if(container){
+                containersMap[query] = container;
+            }
+            return container;
         }
     }
 
