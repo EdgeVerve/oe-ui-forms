@@ -19,14 +19,14 @@
     "@polymer/iron-demo-helpers": "3.0.2",
     "@polymer/iron-test-helpers": "3.0.1",
     "@polymer/paper-tooltip": "3.0.1",
-    "@webcomponents/webcomponentsjs": "2.2.7",
-    "fakerest": "2.1.0",
-    "oe-date": "git+http://evgit/oecloud.io/oe-date.git#master",
-    "oe-input": "git+http://evgit/oecloud.io/oe-input.git#master",
     "@polymer/test-fixture": "4.0.2",
+    "@webcomponents/webcomponentsjs": "2.2.7",
     "axe-core": "3.1.2",
     "chai": "4.2.0",
+    "fakerest": "2.1.0",
     "mocha": "5.2.0",
+    "oe-date": "git+http://evgit/oecloud.io/oe-date.git#master",
+    "oe-input": "git+http://evgit/oecloud.io/oe-input.git#master",
     "sinon": "7.2.3",
     "wct-mocha": "1.0.0"
   }

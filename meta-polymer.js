@@ -5,6 +5,7 @@
  */
 import { OEUtilityMixin } from "oe-mixins/oe-utils-mixin.js";
 import { OECommonMixin } from "oe-mixins/oe-common-mixin.js";
+import "oe-utils/oe-utils.js";
 
 window.OEUtils = window.OEUtils || {};
 var OEUtils = window.OEUtils;
@@ -28,12 +29,11 @@ OEUtils.deepValue = function (obj, path) {
 /**
  * Sets specified `value` on `target` going levels down if required.
  * e.g.
- * o:{}
- * 
+ * ```
  * setDeepValue(o, "x",5) -> o:{x:5}
  * setDeepValue(o, "y.z",6) -> o:{x:5,y:{z:6}}
  * setDeepValue(o, "y.k",7) -> o:{x:5,y:{z:6,k:7}}
- * 
+ * ```
  * @param {Object} target target object to set
  * @param {string} field Path string to set
  * @param {Any} value value to set on the path
@@ -74,161 +74,208 @@ OEUtils.createFunction = function (funcStr) {
 
 /** Start of Type Mapping settings */
 
-var dropdownFormatter = function (value, options) {
-    if (value && options.valueproperty) {
-        return new Promise(function (resolve, reject) {
-            var metaAjax = document.createElement('oe-ajax');
-            metaAjax.contentType = 'application/json';
-            metaAjax.handleAs = 'json';
-            var re = new RegExp('VALUE_STRING', 'g');
-            metaAjax.url = options.dataurl.replace(re, encodeURI(value));
-            metaAjax.addEventListener('response', function (event) {
-                resolve(event.detail.response);
-            });
-            metaAjax.addEventListener('error', function (event) {
-                reject(OEUtils.extractErrorMessage(event));
-            });
-            metaAjax.generateRequest();
-        });
-    } else if (value && options.displayproperty) {
-        return value[options.displayproperty];
-    } else {
-        return value;
-    }
-};
-
-function getSettings(name, options, mapping) {
-    var value = undefined;
-    if (options && options[name] !== undefined) {
-        value = options[name];
-    } else if (mapping && mapping.attributes) {
-        var attr = mapping.attributes.find(function (v) {
-            return v.name === name;
-        });
-        if (attr) {
-            value = attr.value;
-        }
-    }
-    return value;
-}
-/*setting the uitype to TypeMappings in-case user defined then user-defined values else to default values*/
 OEUtils.TypeMappings = OEUtils.TypeMappings || {};
-OEUtils.TypeMappings.date = OEUtils.TypeMappings.date || {
-    uiType: 'oe-date',
-    formatter: function (value, options) {
+
+/**
+ * Setting default TypeMapping for the following types using formatters if needed :
+ * 
+ *  * string
+ *  * integer
+ *  * number
+ *  * date
+ *  * timestamp
+ *  * boolean
+ *  * combo
+ *  * typeahead
+ *  * tags
+ *  * grid
+ *  * object
+ *  * model
+ *  * objectid
+ *  * documentdata
+ */
+(function setDefaultTypeMappings(TypeMappings,DateUtils){
+
+    var dropdownFormatter = function (value, options) {
+        if (value && options.valueproperty) {
+            return new Promise(function (resolve, reject) {
+                var metaAjax = document.createElement('oe-ajax');
+                metaAjax.contentType = 'application/json';
+                metaAjax.handleAs = 'json';
+                var re = new RegExp('VALUE_STRING', 'g');
+                metaAjax.url = options.dataurl.replace(re, encodeURI(value));
+                metaAjax.addEventListener('response', function (event) {
+                    resolve(event.detail.response);
+                });
+                metaAjax.addEventListener('error', function (event) {
+                    reject(OEUtils.extractErrorMessage(event));
+                });
+                metaAjax.generateRequest();
+            });
+        } else if (value && options.displayproperty) {
+            return value[options.displayproperty];
+        } else {
+            return value;
+        }
+    };
+
+    var dateFormatter = function (value, options) {
         if (!value) {
             return value;
         }
-        var format = getSettings('format', options, OEUtils.TypeMappings.date) || 'DD MMM YYYY';
-        return OEUtils.DateUtils.format(value, format);
+        var format = getSettings('format', options, TypeMappings.date) || 'DD MMM YYYY';
+        return DateUtils.format(value, format);
     }
-};
-OEUtils.TypeMappings.timestamp = OEUtils.TypeMappings.timestamp || {
-    uiType: 'oe-datetime',
-    formatter: function (value, options) {
+
+    var timestampFormatter = function (value, options) {
         if (!value) {
             return value;
         }
-        var format = getSettings('format', options, OEUtils.TypeMappings.timestamp) || 'DD MMM YYYY';
-        return OEUtils.DateUtils.format(value, format);
+        var format = getSettings('format', options, TypeMappings.timestamp) || 'DD MMM YYYY';
+        return DateUtils.format(value, format);
     }
-};
-OEUtils.TypeMappings.string = OEUtils.TypeMappings.string || {
-    uiType: 'oe-input'
-};
-OEUtils.TypeMappings.integer = OEUtils.TypeMappings.integer || {
-    uiType: 'oe-input',
-    attributes: [{
-        name: 'type',
-        value: 'number'
-    }]
-};
-OEUtils.TypeMappings.number = OEUtils.TypeMappings.number || {
-    uiType: 'oe-decimal',
-    formatter: function (value, options) {
-        var precision = getSettings('precision', options, OEUtils.TypeMappings.number);
+
+    var numberFormatter = function (value, options) {
+        var precision = getSettings('precision', options, TypeMappings.number);
         return ((value !== null && value !== undefined) && precision !== undefined) ? Number(value).toLocaleString(
             undefined, {
                 minimumFractionDigits: precision,
                 maximumFractionDigits: precision
             }) : value;
     }
-};
-OEUtils.TypeMappings.boolean = OEUtils.TypeMappings.boolean || {
-    uiType: 'oe-checkbox'
-};
-OEUtils.TypeMappings.combo = OEUtils.TypeMappings.combo || {
-    uiType: 'oe-combo',
-    formatter: dropdownFormatter
-};
-OEUtils.TypeMappings.tags = OEUtils.TypeMappings.tags || {
-    uiType: 'oe-paper-chip'
-};
-OEUtils.TypeMappings.list = OEUtils.TypeMappings.list || {
-    uiType: 'oe-list'
-};
-OEUtils.TypeMappings.grid = OEUtils.TypeMappings.grid || {
-    uiType: 'oe-data-table'
-};
-OEUtils.TypeMappings.object = OEUtils.TypeMappings.object || {
-    uiType: 'oe-json-input',
-    formatter: function (value, options) {
-        var indent = getSettings('indent', options, OEUtils.TypeMappings.object) || 2;
+
+    var objectFormatter = function (value, options) {
+        var indent = getSettings('indent', options, TypeMappings.object) || 2;
         if (value && typeof value === 'object') {
             return JSON.stringify(value, null, indent);
         }
         return value;
     }
-};
-OEUtils.TypeMappings.model = OEUtils.TypeMappings.model || {
-    uiType: 'oe-json-input',
-    formatter: function (value, options) {
-        var indent = getSettings('indent', options, OEUtils.TypeMappings.model) || 2;
+
+    var modelFormatter = function (value, options) {
+        var indent = getSettings('indent', options, TypeMappings.model) || 2;
         if (value && typeof value === 'object') {
             return JSON.stringify(value, null, indent);
         }
         return value;
     }
-};
-OEUtils.TypeMappings.objectid = OEUtils.TypeMappings.objectid || {
-    uiType: 'oe-input'
-};
-OEUtils.TypeMappings.typeahead = OEUtils.TypeMappings.typeahead || {
-    uiType: 'oe-typeahead',
-    formatter: dropdownFormatter
-};
-OEUtils.TypeMappings.documentdata = OEUtils.TypeMappings.documentdata || {
-    uiType: 'oe-document-data'
-};
-/* End of setting the uitype to TypeMappings in Case user defined else to default values */
+
+    var getSettings = function (name, options, mapping) {
+        var value = undefined;
+        if (options && options[name] !== undefined) {
+            value = options[name];
+        } else if (mapping && mapping.attributes) {
+            var attr = mapping.attributes.find(function (v) {
+                return v.name === name;
+            });
+            if (attr) {
+                value = attr.value;
+            }
+        }
+        return value;
+    }
+    
+    TypeMappings.string = TypeMappings.string || {
+        uiType: 'oe-input'
+    };
+
+    TypeMappings.integer = TypeMappings.integer || {
+        uiType: 'oe-input',
+        attributes: [{
+            name: 'type',
+            value: 'number'
+        }]
+    };
+
+    TypeMappings.number = TypeMappings.number || {
+        uiType: 'oe-decimal',
+        formatter: numberFormatter
+    };
+
+    TypeMappings.date = TypeMappings.date || {
+        uiType: 'oe-date',
+        formatter: dateFormatter
+    };
+
+    TypeMappings.timestamp = TypeMappings.timestamp || {
+        uiType: 'oe-datetime',
+        formatter: timestampFormatter
+    };
+    
+    TypeMappings.boolean = TypeMappings.boolean || {
+        uiType: 'oe-checkbox'
+    };
+
+    TypeMappings.combo = TypeMappings.combo || {
+        uiType: 'oe-combo',
+        formatter: dropdownFormatter
+    };
+
+    TypeMappings.typeahead = TypeMappings.typeahead || {
+        uiType: 'oe-typeahead',
+        formatter: dropdownFormatter
+    };
+
+    TypeMappings.tags = TypeMappings.tags || {
+        uiType: 'oe-paper-chip'
+    };
+
+    TypeMappings.grid = TypeMappings.grid || {
+        uiType: 'oe-data-table'
+    };
+
+    TypeMappings.object = TypeMappings.object || {
+        uiType: 'oe-json-input',
+        formatter: objectFormatter
+    };
+
+    TypeMappings.model = TypeMappings.model || {
+        uiType: 'oe-json-input',
+        formatter: modelFormatter
+    };
+
+    TypeMappings.objectid = TypeMappings.objectid || {
+        uiType: 'oe-input'
+    };
+
+    TypeMappings.documentdata = TypeMappings.documentdata || {
+        uiType: 'oe-document-data'
+    };
+
+})(OEUtils.TypeMappings,OEUtils.DateUtils)
+
+/* Checking for user overridden type*/
+if(!window.skipFetchingUserTypeMappings){
+    (function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                try {
+                    var typeMappings = JSON.parse(xhttp.responseText);
+                    typeMappings.forEach(function (mapping) {
+                        if (OEUtils.TypeMappings[mapping.type]) {
+                            Object.assign(OEUtils.TypeMappings[mapping.type], mapping);
+                        } else {
+                            OEUtils.TypeMappings[mapping.type] = mapping;
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Unable to fetch TypeMappings , using default mappings');
+                }
+            }
+        };
+        var url = OEUtils.geturl(restApiRoot + '/TypeMappings');
+        xhttp.open('GET', url, true);
+        xhttp.setRequestHeader('Content-Type', 'application/json;charset=encoding');
+        xhttp.send();
+    })();
+}
 
 /** End of Type Mapping settings */
 
-/* Checking for user overridden type*/
-(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (xhttp.readyState === 4 && xhttp.status === 200) {
-            try {
-                var typeMappings = JSON.parse(xhttp.responseText);
-                typeMappings.forEach(function (mapping) {
-                    if (OEUtils.TypeMappings[mapping.type]) {
-                        Object.assign(OEUtils.TypeMappings[mapping.type], mapping);
-                    } else {
-                        OEUtils.TypeMappings[mapping.type] = mapping;
-                    }
-                });
-            } catch (e) {
-                console.warn('Unable to fetch TypeMappings , using default mappings');
-            }
-        }
-    };
-    var url = OEUtils.geturl(restApiRoot + '/TypeMappings');
-    xhttp.open('GET', url, true);
-    xhttp.setRequestHeader('Content-Type', 'application/json;charset=encoding');
-    xhttp.send();
-})();
-
+/**
+ * Custom function to query child content including components within `template` tags
+ */
 (function () {
     var deepQuery = function (selector) {
         var result = this.querySelector(selector);
@@ -357,6 +404,10 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
     var empty = document.createElement('template');
     //Map to hold elements with their fieldids
     var controlsByField = {};
+    //Map to hold containers in template
+    var containersMap = {};
+    //Default injection point for fields
+    var defaultInject = templateCont.deepQuery('#fields') || templateCont;
 
     /**
      * Creates a defaultVM object for a model based on its properties
@@ -768,9 +819,25 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
         }
     }
 
-    /**
     
+    /**
+     * Fetch container from predefined Map or add to map
+     * @param {CSSSelector} query Selector to query the container
+     * @returns { HTMLElement } container element based on the query
      */
+    function _getContainer(query){
+        if(!query){
+            return defaultInject;
+        }
+        var container = containersMap[query];
+        if(container){
+            return container;
+        }else{
+            container = defaultInject.deepQuery(query) || templateCont.deepQuery(query);
+            containersMap[query] = container;
+            return container || defaultInject;
+        }
+    }
 
 
     /**
@@ -980,7 +1047,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
             /**
              * Sets uimeta.content into the template based on the 'oe-container' attribute of each node in content.
              */
-            var defaultInject = templateCont.deepQuery('#fields') || templateCont;
+            var defaultInject = _getContainer();
             if (uimeta.content) {
                 var tpl = document.createElement('template');
                 tpl.innerHTML = uimeta.content;
@@ -993,7 +1060,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
                     var containerName = node.getAttribute('oe-container');
                     var parent = null;
                     if (containerName) {
-                        parent = templateCont.deepQuery('#' + containerName);
+                        parent = _getContainer('#' + containerName);
                         if (!parent) {
                             parent = document.createElement('div');
                             parent.setAttribute('id', containerName);
@@ -1053,9 +1120,9 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
                     setAttributesOnNode(node, fieldId, fmeta, uimeta, defaultInject, false);
                     var cont;
                     if (fmeta.container) {
-                        cont = defaultInject.deepQuery('#' + fmeta.container);
+                        cont = _getContainer('#' + fmeta.container);
                         if (!cont) {
-                            cont = defaultInject.deepQuery(fmeta.container);
+                            cont = _getContainer(fmeta.container);
                         }
                     }
                     if (cont) {
@@ -1076,7 +1143,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
             if (containerSteps && Array.isArray(containerSteps)) {
                 containerSteps.forEach(function (step) {
                     var targetQuery = step.target || uimeta.container.target;
-                    var targetEle = templateCont.deepQuery(targetQuery);
+                    var targetEle = _getContainer(targetQuery);
                     if (!targetEle) {
                         console.warn('Could not find element based on query ' + targetQuery + ' to generate containers');
                         return;
@@ -1090,6 +1157,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
                         });
                     }
                     targetEle.appendChild(contEl);
+                    containersMap['#'+contEl.id] = contEl;
                 });
             }
         }
@@ -1130,7 +1198,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
                     } else {
                         var container;
                         if (fmeta.container) {
-                            container = templateCont.deepQuery('#' + fmeta.container);
+                            container = _getContainer('#' + fmeta.container);
                             if (!container) {
                                 container = document.createElement('div');
                                 container.setAttribute('id', fmeta.container);
@@ -1257,11 +1325,11 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
                     var container;
                     setAttributesOnNode(item.node, item.fieldId, item.fieldMeta, uimeta, defaultInject, false);
                     if (item.fieldMeta.container) {
-                        container = templateCont.deepQuery('#' + item.fieldMeta.container);
+                        container = _getContainer('#' + item.fieldMeta.container);
                         container = container || defaultInject;
                         // if fmeta.container not defined and node type is oe-DATA-TABLE then the grid should render in grids container of default form
                     } else if (item.node.nodeName === 'OE-DATA-TABLE') {
-                        container = templateCont.deepQuery('#grids');
+                        container = _getContainer('#grids');
                         container = container || defaultInject;
                     } else {
                         container = defaultInject;
@@ -1339,10 +1407,13 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
  */
 window.customElements.metadefine = function (eleName, eleClass, options) {
 
-    var uimeta;
     var templateClone = eleClass.template.cloneNode(true);
+    var uimeta = OEUtils.metadataCache[eleName];
 
-    // registering meta- polymer with polymer
+    /**
+     * Creates a temp class extending the given class with enhancements,
+     * Registers this temp class with the element name is customElements registry
+     */
     function registerPolymerElement() {
 
         var elemProperties = eleClass.prototype.properties || {};
@@ -1352,6 +1423,7 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
             type: Object,
             notify: true
         };
+
         //if values are given they are set to the controls
         elemProperties[uimeta.modelAlias].value = elemProperties[uimeta.modelAlias].value || function () {
             var self = this;
@@ -1371,11 +1443,7 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
         };
 
         if (uimeta.polymerConfig) {
-            // Polymer behaviors not supported as of now
-            // for(var i = 0; uimeta.polymerConfig.behaviors && i < uimeta.polymerConfig.behaviors.length; i++) {
-            //     prototype.behaviors.push(OEUtils.deepValue(window, uimeta.polymerConfig.behaviors[i]));
-            // }
-
+            
             uimeta.polymerConfig.functions && Object.keys(uimeta.polymerConfig.functions).forEach(function (funcName) {
                 eleClass.prototype[funcName] = OEUtils.createFunction(uimeta.polymerConfig.functions[funcName]);
             });
@@ -1384,11 +1452,6 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
                 elemProperties[propName] = uimeta.polymerConfig.properties[propName];
             });
 
-            // Listeners support is deprecated and should be handled on connectedCallback
-            // uimeta.polymerConfig.listeners && Object.keys(uimeta.polymerConfig.listeners).forEach(function(eventName) {
-            //     prototype.listeners = prototype.listeners || {};
-            //     prototype.listeners[eventName] = uimeta.polymerConfig.listeners[eventName];
-            // });
         }
 
 
@@ -1396,7 +1459,6 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
         if (typeof eleClass.prototype._clearAllErrors === "function") {
             observersList = ['_clearAllErrors(' + uimeta.modelAlias + ')'];
         }
-
 
         var tempClass = class extends OEUtilityMixin(MetaMixin(eleClass)) {
 
@@ -1430,11 +1492,11 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
 
         window.customElements.define(eleName, tempClass, options);
     }
-    /*Polymer is registered with MetaPolymer */
-
-
-
-    // Populate modelDefCache
+    
+    /**
+     * Stores the metadata of models present in uimeta in global variable for caching
+     * @param {object} uimeta 
+     */
     function populateModelDefCache(uimeta) {
         if (uimeta.metadata && uimeta.metadata.models) {
             var models = uimeta.metadata.models;
@@ -1446,8 +1508,20 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
         }
     }
 
-    // Check if the meta data is present in the global object else fetch it from server
-    if (!OEUtils.metadataCache[eleName]) {
+    /**
+     * Populates the cache and modifies the template based on metadata before registering the component
+     * @param {object} uimeta Meta data for the component
+     * @param {HTMLTemplate} template Template of the component
+     * @param {class} elementClass class of the component
+     */
+    function transformElement(uimeta,template,elementClass){
+        populateModelDefCache(uimeta);
+        OEUtils.Metamorph(template, uimeta, elementClass);
+        registerPolymerElement();
+    }
+
+    /** Get the meta data from global variable or server and modify the the component */
+    if (!uimeta) {
         var url = restApiRoot + '/UIComponents/modelmeta/' + eleName;
         url = OEUtils.geturl(url);
         var xhttp = new XMLHttpRequest();
@@ -1456,9 +1530,7 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
             if (xhttp.readyState === 4 && xhttp.status === 200) {
                 uimeta = JSON.parse(xhttp.responseText);
                 OEUtils.metadataCache[eleName] = uimeta;
-                populateModelDefCache(uimeta);
-                OEUtils.Metamorph(templateClone, uimeta, eleClass);
-                registerPolymerElement();
+                transformElement(uimeta,templateClone,eleClass);
             }
         };
 
@@ -1466,10 +1538,7 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
         xhttp.setRequestHeader('Content-Type', 'application/json;charset=encoding');
         xhttp.send();
     } else {
-        uimeta = OEUtils.metadataCache[eleName];
-        populateModelDefCache(uimeta);
-        OEUtils.Metamorph(templateClone, uimeta, eleClass);
-        registerPolymerElement();
+        transformElement(uimeta,templateClone,eleClass);
     }
 
 };
