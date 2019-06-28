@@ -2,7 +2,7 @@
   "name": "oe-ui-forms",
   "description": "oeCloud implemenetation for managing form based components",
   "main": "oe-ui-forms.js",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "scripts": {
     "test": "polymer test --module-resolution node --skip-selenium-install",
     "lint": "eslint .",
@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@polymer/polymer": "3.1.0",
-    "oe-ajax": "git+http://evgit/oecloud.io/oe-ajax.git#master",
-    "oe-mixins": "git+http://evgit/oecloud.io/oe-mixins.git#master",
-    "oe-utils": "git+http://evgit/oecloud.io/oe-utils.git#master"
+    "oe-ajax": "git+http://evgit/oecloud.io/oe-ajax.git#2.0.0",
+    "oe-mixins": "git+http://evgit/oecloud.io/oe-mixins.git#2.1.0",
+    "oe-utils": "git+http://evgit/oecloud.io/oe-utils.git#2.0.0"
   },
   "devDependencies": {
     "@polymer/iron-component-page": "4.0.1",
@@ -25,8 +25,8 @@
     "chai": "4.2.0",
     "fakerest": "2.1.0",
     "mocha": "5.2.0",
-    "oe-date": "git+http://evgit/oecloud.io/oe-date.git#master",
-    "oe-input": "git+http://evgit/oecloud.io/oe-input.git#master",
+    "oe-date": "git+http://evgit/oecloud.io/oe-date.git#2.1.0",
+    "oe-input": "git+http://evgit/oecloud.io/oe-input.git#2.1.0",
     "sinon": "7.2.3",
     "wct-mocha": "1.0.0"
   }
