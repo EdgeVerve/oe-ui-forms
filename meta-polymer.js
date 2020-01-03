@@ -1415,7 +1415,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
  * @param {Function} eleClass A class object that defines the behaviour of the element.
  * @param {Object} options options on defining like {extend:'button'}
  */
-window.customElements.metadefine = function (eleName, eleClass, options) {
+OEUtils.metadefine = function (eleName, eleClass, options) {
 
     var templateClone = eleClass.template.cloneNode(true);
     var uimeta = OEUtils.metadataCache[eleName];
@@ -1552,3 +1552,4 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
     }
 
 };
+window.customElements.metadefine = OEUtils.metadefine;
