@@ -163,7 +163,7 @@ class lazyComponent extends OECommonMixin(PolymerElement) {
    */
   _loadElement() {
     var self = this;
-    if (!self.url) {
+    if (!self.url && !self.elementName) {
       return;
     }
     if (self.initialised) {
