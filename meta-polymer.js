@@ -126,7 +126,7 @@ OEUtils.TypeMappings = OEUtils.TypeMappings || {};
         }
         var format = getSettings('format', options, TypeMappings.date) || 'DD MMM YYYY';
         return DateUtils.format(value, format);
-    }
+    };
 
     var timestampFormatter = function (value, options) {
         if (!value) {
@@ -134,7 +134,7 @@ OEUtils.TypeMappings = OEUtils.TypeMappings || {};
         }
         var format = getSettings('format', options, TypeMappings.timestamp) || 'DD MMM YYYY';
         return DateUtils.format(value, format);
-    }
+    };
 
     var numberFormatter = function (value, options) {
         var precision = getSettings('precision', options, TypeMappings.number);
@@ -143,7 +143,7 @@ OEUtils.TypeMappings = OEUtils.TypeMappings || {};
                 minimumFractionDigits: precision,
                 maximumFractionDigits: precision
             }) : value;
-    }
+    };
 
     var objectFormatter = function (value, options) {
         var indent = getSettings('indent', options, TypeMappings.object) || 2;
@@ -151,7 +151,7 @@ OEUtils.TypeMappings = OEUtils.TypeMappings || {};
             return JSON.stringify(value, null, indent);
         }
         return value;
-    }
+    };
 
     var modelFormatter = function (value, options) {
         var indent = getSettings('indent', options, TypeMappings.model) || 2;
@@ -159,7 +159,7 @@ OEUtils.TypeMappings = OEUtils.TypeMappings || {};
             return JSON.stringify(value, null, indent);
         }
         return value;
-    }
+    };
 
     var getSettings = function (name, options, mapping) {
         var value = undefined;
@@ -174,7 +174,7 @@ OEUtils.TypeMappings = OEUtils.TypeMappings || {};
             }
         }
         return value;
-    }
+    };
     
     TypeMappings.string = TypeMappings.string || {
         uiType: 'oe-input'
@@ -243,7 +243,7 @@ OEUtils.TypeMappings = OEUtils.TypeMappings || {};
         uiType: 'oe-document-data'
     };
 
-})(OEUtils.TypeMappings,OEUtils.DateUtils)
+})(OEUtils.TypeMappings,OEUtils.DateUtils);
 
 /* Checking for user overridden type*/
 if(!window.skipFetchingUserTypeMappings){
@@ -394,7 +394,7 @@ OEUtils.getModelDefinition = function (model, done) {
 
 /**
  * Modifies the template and prototype provided based on the ui meta
- * @param {HTMLTemplate} template 
+ * @param {HTMLTemplate} template template to transform
  * @param {Object} uimeta meta data for the element
  * @param {Function} eleClass class of the element
  */
@@ -808,7 +808,9 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
             var recordHandling = 'local';
             node.setAttribute('record-handling', recordHandling);
             //node.setAttribute('columns', '[[fields.' + fieldId + '.columns]]');
-            fieldId && node.setAttribute('items', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
+            if(fieldId && !node.hasAttribute('items')){
+                node.setAttribute('items', '{{' + (fmeta.bindto || modelAlias) + '.' + fieldId + '}}');
+            }
 
             var defaultFormUrl = fmeta['editor-form-url'];
             if(fmeta.modeltype) {
@@ -817,7 +819,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
                 defaultFormUrl = defaultFormUrl || (restApiRoot + '/UIComponents/component/' + fmeta.modeltype.toLowerCase() +
                     '-form.html');
             }
-            defaultFormUrl && node.setAttribute('editor-form-url', defaultFormUrl);
+            defaultFormUrl && !node.hasAttribute('editor-form-url') && node.setAttribute('editor-form-url', defaultFormUrl);
         }
 
         if (fmeta.textContent) {
@@ -829,7 +831,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
     /**
      * Fetch container from predefined Map or add to map
      * @param {CSSSelector} query Selector to query the container
-     * @returns { HTMLElement } container element based on the query
+     * @return { HTMLElement } container element based on the query
      */
     function _getContainer(query){
         if(!query){
@@ -1005,7 +1007,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
          * @param {HTMLElement} parent parent node
          * @param {HTMLElement} node node to start the seach
          * @param {string} query HTML querySelector string
-         * @param {Array} results 
+         * @param {Array} results list of nodes 
          */
         function walk(parent, node, query, results) {
             var nodes = node.querySelectorAll(query);
@@ -1027,7 +1029,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
                         itemName = parent.getAttribute('as');
                     }
                     var binding = '{{' + itemName + '.' + metaId + '}}';
-                    nodes[j].setAttribute('value', binding);
+                    !nodes[j].hasAttribute('value') && nodes[j].setAttribute('value', binding);
                     metaId = parentFieldId + '.' + metaId;
                 }
                 nodes[j].setAttribute('meta-field-id', metaId);
@@ -1413,7 +1415,7 @@ OEUtils.Metamorph = function (template, uimeta, eleClass) {
  * @param {Function} eleClass A class object that defines the behaviour of the element.
  * @param {Object} options options on defining like {extend:'button'}
  */
-window.customElements.metadefine = function (eleName, eleClass, options) {
+OEUtils.metadefine = function (eleName, eleClass, options) {
 
     var templateClone = eleClass.template.cloneNode(true);
     var uimeta = OEUtils.metadataCache[eleName];
@@ -1503,7 +1505,7 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
     
     /**
      * Stores the metadata of models present in uimeta in global variable for caching
-     * @param {object} uimeta 
+     * @param {Object} uimeta 
      */
     function populateModelDefCache(uimeta) {
         if (uimeta.metadata && uimeta.metadata.models) {
@@ -1518,7 +1520,7 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
 
     /**
      * Populates the cache and modifies the template based on metadata before registering the component
-     * @param {object} uimeta Meta data for the component
+     * @param {Object} uimeta Meta data for the component
      * @param {HTMLTemplate} template Template of the component
      * @param {class} elementClass class of the component
      */
@@ -1550,3 +1552,4 @@ window.customElements.metadefine = function (eleName, eleClass, options) {
     }
 
 };
+window.customElements.metadefine = OEUtils.metadefine;
