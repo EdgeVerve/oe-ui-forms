@@ -1044,7 +1044,7 @@
                 test('Infield validation failure cause errors', function (done) {
                     expect(component.errors).to.be.empty;
                     var input = component.shadowRoot.querySelector('[field-id=totalExp]');
-                    input.inputElement.set('value', 'foobar');
+                    input.inputElement.set('bindValue', 'foobar');
                     input.inputElement.fire('change');
                     forceXIfStamp(input);
                     expect(component.errors).to.not.be.empty;

@@ -2,7 +2,7 @@
   "name": "oe-ui-forms",
   "description": "oeCloud implemenetation for managing form based components",
   "main": "oe-ui-forms.js",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "scripts": {
     "test": "polymer test --module-resolution node --skip-selenium-install",
     "lint": "eslint .",

@@ -69,7 +69,8 @@ class lazyComponent extends OECommonMixin(PolymerElement) {
        * Name of the element to be created , if element definition is not exported by the component file.
        */
       elementName: {
-        type: String
+        type: String,
+        observer: "_elementChanged"
       }
     };
   }
@@ -87,6 +88,13 @@ class lazyComponent extends OECommonMixin(PolymerElement) {
    */
   _setUrl(newUrl, oldUrl) { // eslint-disable-line no-unused-vars
     if (this.url) {
+      this.initialised = false;
+      this._loadElement();
+    }
+  }
+
+  _elementChanged(newName,oldName){
+    if(this.elementName){
       this.initialised = false;
       this._loadElement();
     }
@@ -155,7 +163,7 @@ class lazyComponent extends OECommonMixin(PolymerElement) {
    */
   _loadElement() {
     var self = this;
-    if (!self.url) {
+    if (!self.url && !self.elementName) {
       return;
     }
     if (self.initialised) {
@@ -163,6 +171,13 @@ class lazyComponent extends OECommonMixin(PolymerElement) {
     }
     self.initialised = true;
     
+    if(self.elementName && typeof window.customElements.get(self.elementName) === "function"){
+      // if the element is already registered as custom element skip Import
+      self.loaded = false;
+      self.__loadComponent(self.elementName);
+      return;
+    }
+
     import(self.url).then(function (e) {
       self.loaded = false;
       var elName;
@@ -175,33 +190,34 @@ class lazyComponent extends OECommonMixin(PolymerElement) {
         self.fire('oe-show-error', "Unable to identify the element name");
         return;
       }
-
-      var el = document.createElement(elName);
-      if (el.set) {
-        self.element = el;
-        self._modelName = el.modelAlias || 'vm';
-        el.set(self._modelName, self.model);
-        if (self.emitOnSave) {
-          el.set('emitOnSave', self.emitOnSave);
-        }
-        self._registerEvent(el);
-      } else {
-        el.addEventListener('meta-attached', function () {
-          self.element = el;
-          self._modelName = el.modelAlias || 'vm';
-          el.set(self._modelName, self.model);
-          self._registerEvent(el);
-        });
-      }
-
-      var pDom = new DomApi(self.root);
-
-      if (pDom.children.length) {
-        pDom.replaceChild(el, pDom.children[0]);
-      } else {
-        pDom.appendChild(el);
-      }
+      self.__loadComponent(elName);
     });
+  }
+
+  __loadComponent(elName){
+    var el = document.createElement(elName);
+    if (el.set) {
+      this.element = el;
+      this._modelName = el.modelAlias || 'vm';
+      el.set(this._modelName, this.model);
+      if (this.emitOnSave) {
+        el.set('emitOnSave', this.emitOnSave);
+      }
+      this._registerEvent(el);
+    } else {
+      el.addEventListener('meta-attached', function () {
+        this.element = el;
+        this._modelName = el.modelAlias || 'vm';
+        el.set(this._modelName, this.model);
+        this._registerEvent(el);
+      }.bind(this));
+    }
+    var pDom = new DomApi(this.root);
+    if (pDom.children.length) {
+      pDom.replaceChild(el, pDom.children[0]);
+    } else {
+      pDom.appendChild(el);
+    }
   }
 
   connectedCallback() {
